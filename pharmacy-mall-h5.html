@@ -38,7 +38,7 @@
           <p class="text-base font-bold leading-snug">组合购药理赔限额内 <span class="text-yellow-200">0元</span></p>
           <p class="text-xs opacity-95 mt-1">在线问诊+药品费用直赔+送药到家</p>
         </div>
-        <div class="flex-1 overflow-y-auto px-3 py-3 pb-24 safe-pb space-y-3">
+        <div class="flex-1 overflow-y-auto px-3 py-3 pb-28 safe-pb space-y-3">
           <template x-for="b in comboPurchaseBundles" :key="b.id">
             <div class="bg-white rounded-xl shadow-sm p-3 border border-slate-100/80">
               <div class="flex gap-3">
@@ -77,7 +77,7 @@
           <p class="text-sm font-bold">理赔限额内 0元购 · 直赔到家</p>
           <p class="text-[11px] opacity-90 mt-0.5" x-text="comboActiveBundle.title"></p>
         </div>
-        <div class="flex-1 overflow-y-auto px-3 py-4 pb-32 safe-pb">
+        <div class="flex-1 overflow-y-auto px-3 py-4 pb-40 safe-pb">
           <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100">
             <div class="flex gap-3">
               <div class="w-28 h-28 shrink-0 rounded-xl bg-slate-100 flex items-center justify-center text-4xl text-slate-400"><i class="ri-image-line"></i></div>
@@ -99,7 +99,7 @@
           </div>
           <p class="text-center text-[11px] text-slate-400 mt-4 px-2">以下药品在选购页支持勾选与改量，结算时按权益直赔规则计算（演示）。</p>
         </div>
-        <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 px-4 py-3 safe-pb z-[59] flex gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+        <div class="fixed bottom-14 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 px-4 py-3 safe-pb z-[61] flex gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
           <button type="button" @click="showService = true" class="px-3 py-2 rounded-xl border border-slate-200 text-sm text-slate-600">客服</button>
           <button type="button" @click="openComboSelect()" class="flex-1 py-3 rounded-full bg-orange-500 text-white text-sm font-bold">去购买</button>
         </div>
@@ -159,7 +159,7 @@
           <span><i class="ri-fire-line"></i></span>
           <span>再加购 <b>108</b> 元药品，自费支付 <b>0</b> 元（演示进度）</span>
         </div>
-        <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 px-3 py-3 safe-pb z-[59] shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+        <div class="fixed bottom-14 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 px-3 py-3 safe-pb z-[61] shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
           <div class="flex items-center gap-3 mb-2">
             <label class="flex items-center gap-2 text-sm text-slate-700 shrink-0 cursor-pointer">
               <input type="checkbox" :checked="comboSelectAllChecked" @change="toggleComboSelectAll($event.target.checked)" class="rounded border-slate-300 text-teal-500" />
@@ -171,6 +171,105 @@
             </div>
             <button type="button" @click="comboBuyNow()" :disabled="comboSelectCount === 0" class="shrink-0 rounded-full bg-orange-500 text-white px-4 py-2.5 text-sm font-bold disabled:opacity-40">立即购药</button>
           </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- ========== 搜索页（参考图样式） ========== -->
+    <template x-if="view === 'search'">
+      <div class="fixed inset-0 z-[58] bg-[#f2f2f2] max-w-md mx-auto left-0 right-0 flex flex-col">
+        <header class="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white">
+          <div class="h-14 px-3 flex items-center justify-between">
+            <button type="button" @click="closeSearch()" class="w-8 h-8 flex items-center justify-center text-2xl text-white/90">
+              <i class="ri-arrow-left-s-line"></i>
+            </button>
+            <h1 class="text-lg font-semibold tracking-wide">搜索</h1>
+            <div class="h-8 px-2 rounded-full bg-indigo-700/45 border border-white/20 flex items-center gap-2 text-white/90">
+              <i class="ri-more-fill text-sm"></i>
+              <i class="ri-focus-3-line text-base"></i>
+            </div>
+          </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto px-3 py-4 pb-24 space-y-5 safe-pb">
+          <div class="flex items-center gap-2">
+            <div class="flex-1 rounded-full border-2 border-orange-500 bg-white pl-4 pr-1 py-1 flex items-center gap-2">
+              <i class="ri-search-line text-[22px] leading-none text-orange-500"></i>
+              <input type="search"
+                     x-model="searchKeyword"
+                     @keydown.enter="submitSearch()"
+                     placeholder="牛奶"
+                     class="flex-1 bg-transparent text-lg text-slate-700 placeholder:text-slate-400 outline-none" />
+              <button type="button" @click="submitSearch()" class="px-7 py-2 rounded-full bg-orange-500 text-white text-base font-medium">搜索</button>
+            </div>
+            <button type="button" @click="closeSearch()" class="text-lg text-slate-700">取消</button>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div class="text-2xl leading-none font-semibold text-slate-500">搜索历史</div>
+              <button type="button" @click="searchHistory = []" class="text-slate-400 text-2xl">
+                <i class="ri-delete-bin-7-line"></i>
+              </button>
+            </div>
+            <div class="flex flex-wrap gap-3">
+              <template x-for="h in searchHistory" :key="h">
+                <button type="button" @click="selectSearchKeyword(h)" class="px-4 py-2 rounded-full bg-[#e5e5e5] text-base text-slate-700" x-text="h"></button>
+              </template>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-2xl leading-none font-semibold text-slate-500 mb-3">猜你想搜</div>
+            <div class="flex flex-wrap gap-3">
+              <template x-for="k in searchSuggests" :key="k">
+                <button type="button" @click="selectSearchKeyword(k)" class="px-4 py-2 rounded-full bg-[#f6ede8] text-base text-orange-500" x-text="k"></button>
+              </template>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2" x-show="searchHasSearched && searchResults.length">
+            <template x-for="d in searchResults" :key="d.id + '-search'">
+              <div class="rounded-xl border border-slate-100 bg-white overflow-hidden shadow-sm flex flex-col">
+                <button type="button" @click="openDrug(d)" aria-label="查看商品详情" class="aspect-square bg-slate-100 overflow-hidden w-full">
+                  <img :src="d.thumb" alt="" class="w-full h-full object-cover pointer-events-none" />
+                </button>
+                <div class="p-2 flex-1 flex flex-col">
+                  <p class="text-[9px] text-slate-500">
+                    <span class="px-1 py-0.5 rounded border" :class="(d.drugKind || 'otc') === 'rx' ? 'border-amber-300 bg-amber-50 text-amber-800' : 'border-slate-200 bg-slate-50 text-slate-600'" x-text="(d.drugKind || 'otc') === 'rx' ? '处方药' : '非处方药'"></span>
+                  </p>
+                  <button type="button" @click="openDrug(d)" class="text-left w-full mt-1 min-h-[2rem] rounded-md -mx-0.5 px-0.5 py-0.5 text-[10px] text-slate-700 leading-tight hover:text-brand-600 active:bg-slate-50 transition-colors">
+                    <span class="line-clamp-2 block" x-text="d.name"></span>
+                  </button>
+                  <div class="mt-1">
+                    <template x-if="!drugShowEquity">
+                      <div class="leading-tight">
+                        <p class="text-red-600 font-bold text-sm">¥<span x-text="drugOriginalPrice(d).toFixed(2)"></span><span class="text-[10px] ml-0.5">原价</span></p>
+                        <p class="text-red-500 text-xs mt-0.5">¥?<span class="text-[10px] ml-0.5">权益价</span></p>
+                      </div>
+                    </template>
+                    <template x-if="drugShowEquity">
+                      <div class="leading-tight">
+                        <div class="mt-0.5 inline-flex flex-col border-2 border-lime-500/80 bg-lime-50/50 rounded-md px-2.5 py-1">
+                          <div class="flex items-center gap-2">
+                            <span class="text-red-600 font-bold text-sm leading-none">¥<span x-text="drugEquityPrice(d).toFixed(2)"></span></span>
+                            <span class="text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded">补贴价</span>
+                            <span class="text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded">
+                              已补贴¥<span x-text="drugSavedAmount(d).toFixed(2)"></span>
+                            </span>
+                          </div>
+                          <p class="text-[10px] text-slate-400 mt-1">原价¥<span x-text="drugOriginalPrice(d).toFixed(2)"></span></p>
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+                  <button type="button" @click.stop="addToCart(d)" class="mt-2 py-1.5 rounded-full bg-red-500 text-white text-[10px] font-semibold w-full">立即抢购 ></button>
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <div x-show="searchHasSearched && !searchResults.length" class="text-center text-xs text-slate-400 py-10">暂无匹配药品</div>
         </div>
       </div>
     </template>
@@ -242,8 +341,11 @@
             <button type="button" @click="ordersStatus = 'waiting_receipt'" class="flex-1 py-2 rounded-full text-sm font-semibold border" :class="ordersStatus === 'waiting_receipt' ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-slate-600 border-slate-200'">待收货</button>
             <button type="button" @click="ordersStatus = 'completed'" class="flex-1 py-2 rounded-full text-sm font-semibold border" :class="ordersStatus === 'completed' ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-slate-600 border-slate-200'">已完成</button>
           </div>
+          <div class="flex gap-2 mt-2">
+            <button type="button" @click="ordersStatus = 'closed'" class="w-full py-2 rounded-full text-sm font-semibold border" :class="ordersStatus === 'closed' ? 'bg-slate-700 text-white border-slate-700' : 'bg-white text-slate-600 border-slate-200'">已关闭</button>
+          </div>
         </div>
-        <div class="flex-1 overflow-y-auto px-3 py-3 safe-pb space-y-3">
+        <div class="flex-1 overflow-y-auto px-3 py-3 pb-24 safe-pb space-y-3">
           <template x-if="filteredOrders.length === 0">
             <div class="bg-white rounded-2xl border border-slate-100 p-4 text-center text-sm text-slate-500">
               暂无该状态订单
@@ -273,108 +375,225 @@
 
     <!-- ========== 我的订单：详情页 ========== -->
     <template x-if="view === 'orderDetail' && activeOrder">
-      <div class="fixed inset-0 z-[58] bg-gray-50 flex flex-col max-w-md mx-auto left-0 right-0">
-        <header class="shrink-0 flex items-center gap-2 px-3 py-3 bg-white border-b border-slate-100">
-          <button type="button" @click="closeOrderDetail()" class="p-2 -ml-1 rounded-xl text-slate-700 text-lg" aria-label="返回">←</button>
-          <h1 class="font-bold text-lg text-slate-900 flex-1 text-center pr-8">订单详情</h1>
+      <div class="fixed inset-0 z-[58] bg-[#f4f4f5] flex flex-col max-w-md mx-auto left-0 right-0">
+        <header class="shrink-0 flex items-center gap-2 px-3 py-3 bg-[#6B5BC8] text-white">
+          <button type="button" @click="closeOrderDetail()" class="p-2 -ml-1 rounded-xl text-white/95 text-lg" aria-label="返回">←</button>
+          <h1 class="font-bold text-base flex-1 text-center pr-8">订单详情</h1>
+          <span class="flex items-center gap-1 text-white/90 text-lg pr-1"><i class="ri-more-2-fill"></i></span>
         </header>
 
-        <div class="shrink-0 bg-white border-b border-slate-100 px-3 py-3 space-y-2">
-          <div class="flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <div class="text-sm font-bold text-slate-900 truncate" x-text="activeOrder.orderNo"></div>
-              <div class="text-xs text-slate-500 mt-1" x-text="activeOrder.createTime"></div>
+        <!-- 订单关闭 -->
+        <template x-if="activeOrder.status === 'closed'">
+          <div class="flex-1 flex flex-col min-h-0">
+            <div class="shrink-0 bg-white px-3 py-4 border-b border-slate-100">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="text-xl font-bold text-slate-900">订单关闭</p>
+                  <span x-show="activeOrder.hasRx" class="inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded border border-orange-400 text-orange-600 bg-orange-50">RX</span>
+                </div>
+                <button type="button" @click="backToHomeFromOrderDetail()" class="shrink-0 text-xs flex items-center gap-1 text-slate-600 border border-slate-200 rounded-full px-3 py-1.5 bg-white">
+                  <i class="ri-home-4-line"></i> 返回首页
+                </button>
+              </div>
             </div>
-            <div class="text-right shrink-0">
-              <div class="text-sm font-bold text-red-600">¥<span x-text="activeOrder.amount.toFixed(2)"></span></div>
-              <div class="mt-1 text-[10px] font-semibold rounded-full px-2 py-1" :class="orderStatusPill(activeOrder.status).cls" x-text="orderStatusPill(activeOrder.status).txt"></div>
+            <div class="flex-1 overflow-y-auto px-3 py-3 pb-32 space-y-3 safe-pb">
+              <div class="bg-white rounded-xl p-4 text-sm space-y-2 shadow-sm border border-slate-100">
+                <p><span class="text-slate-500">收件人</span> <span class="font-medium text-slate-900" x-text="activeOrder.receiver"></span> <span class="text-slate-600" x-text="activeOrder.phoneMask || ''"></span></p>
+                <p class="text-slate-800 leading-relaxed" x-text="activeOrder.address"></p>
+                <div class="flex items-center justify-between text-xs pt-2 border-t border-slate-100 gap-2">
+                  <span class="text-slate-500">订单流水号：<span class="font-mono text-slate-800 break-all" x-text="activeOrder.orderNo"></span></span>
+                  <button type="button" @click="copyOrderNo(activeOrder.orderNo)" class="shrink-0 text-[#6B5BC8] font-medium">复制</button>
+                </div>
+                <p class="text-xs text-slate-500">下单时间：<span x-text="activeOrder.createTime"></span></p>
+              </div>
+              <div class="rounded-xl overflow-hidden bg-gradient-to-r from-amber-100 to-orange-50 border border-orange-100 px-3 py-2 flex items-center justify-between text-xs">
+                <span class="font-medium text-amber-900">老白健康APP · 更多健康服务</span>
+                <button type="button" class="text-orange-600 font-semibold">立即下载</button>
+              </div>
+              <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
+                <p class="text-xs text-slate-500 mb-3 flex items-center gap-1"><i class="ri-store-2-line"></i> 重庆亿保医药有限公司第一分公司</p>
+                <template x-for="(it, oidx) in activeOrder.items" :key="'oc-' + oidx + '-' + it.name">
+                  <div class="flex gap-3 py-3 border-b border-slate-100 last:border-0">
+                    <div class="relative w-16 h-16 rounded-lg bg-slate-100 shrink-0 overflow-hidden">
+                      <img x-show="it.thumb" :src="it.thumb" alt="" class="w-full h-full object-cover" />
+                      <div x-show="!it.thumb" class="w-full h-full flex items-center justify-center text-slate-400"><i class="ri-capsule-line text-xl"></i></div>
+                      <div x-show="it.drugKind === 'rx'" class="absolute inset-0 bg-black/40 flex items-center justify-center px-0.5 pointer-events-none">
+                        <p class="text-[6px] text-white text-center leading-tight">凭处方购买</p>
+                      </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <span class="text-[9px] px-1.5 py-0.5 rounded font-semibold" :class="(it.drugKind || 'otc') === 'rx' ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-emerald-50 text-emerald-700 border border-emerald-100'" x-text="(it.drugKind || 'otc') === 'rx' ? '处方药' : '非处方药'"></span>
+                      <p class="text-sm font-semibold text-slate-900 mt-1 line-clamp-2" x-text="it.name"></p>
+                      <p class="text-[11px] text-slate-500 mt-0.5" x-text="it.spec"></p>
+                      <div class="flex items-end justify-between mt-2 gap-2">
+                        <div>
+                          <template x-if="it.type === 'drug'">
+                            <template x-if="drugShowEquity">
+                              <p class="text-red-600 font-bold text-sm leading-snug">
+                                ¥<span x-text="drugEquityPrice(it).toFixed(2)"></span> 到手价｜
+                                <span class="text-[11px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded ml-1">
+                                  已补贴¥<span x-text="drugSavedAmount(it).toFixed(2)"></span>
+                                </span>
+                              </p>
+                              <p class="text-[10px] text-slate-400 mt-0.5">原价¥<span x-text="drugOriginalPrice(it).toFixed(2)"></span></p>
+                            </template>
+                            <template x-if="!drugShowEquity">
+                              <p class="text-red-600 font-bold text-sm leading-snug">
+                                ¥<span x-text="drugOriginalPrice(it).toFixed(2)"></span> 原价
+                              </p>
+                              <p class="text-[10px] text-red-500 mt-0.5">¥? <span class="ml-0.5">权益价</span></p>
+                            </template>
+                          </template>
+                          <template x-if="it.type !== 'drug'">
+                            <p class="text-red-600 font-bold">¥<span x-text="(it.unitPrice != null ? it.unitPrice : (it.subtotal / Math.max(1, it.qty))).toFixed(2)"></span></p>
+                          </template>
+                        </div>
+                        <span class="text-slate-500 text-sm">x<span x-text="it.qty"></span></span>
+                      </div>
+                    </div>
+                    <button type="button" @click="reorderOneLineFromOrder(it)" class="shrink-0 self-center px-3 py-1.5 rounded-full border border-slate-300 text-xs text-slate-800 font-medium h-fit">再次购买</button>
+                  </div>
+                </template>
+              </div>
+            </div>
+            <div class="shrink-0 fixed bottom-14 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 px-3 py-3 safe-pb z-[61] flex gap-3 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+              <button type="button" @click="openDeleteOrderConfirm()" class="flex-1 py-3 rounded-full border border-slate-300 text-slate-800 text-sm font-semibold">删除订单</button>
+              <button type="button" @click="reorderAllFromActive()" class="flex-1 py-3 rounded-full bg-gradient-to-r from-red-500 to-orange-500 text-white text-sm font-semibold shadow-md">再次购买</button>
             </div>
           </div>
-          <div class="text-xs text-slate-500">
-            收货信息：<span x-text="activeOrder.receiver"></span> · <span x-text="activeOrder.address"></span>
-          </div>
-          <div class="text-xs text-slate-500">
-            配送信息：<span x-text="activeOrder.shippingText"></span>
-          </div>
-        </div>
+        </template>
 
-        <div class="flex-1 overflow-y-auto px-3 py-3 safe-pb space-y-3">
-          <div class="bg-white rounded-2xl border border-slate-100 p-4">
-            <p class="text-sm font-semibold text-slate-900 mb-3">商品清单</p>
-            <div class="space-y-3">
-              <template x-for="it in activeOrder.items" :key="it.name">
-                <div class="flex items-start gap-3">
-                  <div class="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 shrink-0">
-                    <i class="ri-capsule-line"></i>
+        <!-- 非关闭订单 -->
+        <template x-if="activeOrder.status !== 'closed'">
+          <div class="flex-1 flex flex-col min-h-0">
+            <div class="shrink-0 bg-white border-b border-slate-100 px-3 py-3 space-y-2">
+              <div class="flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                  <div class="text-sm font-bold text-slate-900 truncate" x-text="activeOrder.orderNo"></div>
+                  <div class="text-xs text-slate-500 mt-1" x-text="activeOrder.createTime"></div>
+                </div>
+                <div class="text-right shrink-0">
+                  <div class="text-sm font-bold text-red-600">¥<span x-text="activeOrder.amount.toFixed(2)"></span></div>
+                  <div class="mt-1 text-[10px] font-semibold rounded-full px-2 py-1" :class="orderStatusPill(activeOrder.status).cls" x-text="orderStatusPill(activeOrder.status).txt"></div>
+                </div>
+              </div>
+              <div class="text-xs text-slate-500">
+                收货信息：<span x-text="activeOrder.receiver"></span> · <span x-text="activeOrder.address"></span>
+              </div>
+              <div class="text-xs text-slate-500">
+                配送信息：<span x-text="activeOrder.shippingText"></span>
+              </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto px-3 py-3 pb-28 safe-pb space-y-3">
+              <div class="bg-white rounded-2xl border border-slate-100 p-4">
+                <p class="text-sm font-semibold text-slate-900 mb-3">商品清单</p>
+                <div class="space-y-3">
+                  <template x-for="it in activeOrder.items" :key="it.name">
+                    <div class="flex items-start gap-3">
+                      <div class="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 shrink-0 overflow-hidden">
+                        <img x-show="it.thumb" :src="it.thumb" alt="" class="w-full h-full object-cover" />
+                        <i x-show="!it.thumb" class="ri-capsule-line"></i>
+                      </div>
+                      <div class="min-w-0 flex-1">
+                        <p class="text-sm font-semibold text-slate-900 line-clamp-2" x-text="it.name"></p>
+                        <p class="text-xs text-slate-500 mt-1"><span x-text="'规格：' + it.spec"></span></p>
+                        <p class="text-xs text-slate-500 mt-1" x-text="'数量：' + it.qty + ' 件'"></p>
+                      </div>
+                      <div class="text-right shrink-0">
+                        <template x-if="it.type === 'drug'">
+                          <template x-if="drugShowEquity">
+                            <p class="text-sm font-bold text-red-600 leading-snug">
+                              ¥<span x-text="drugEquityPrice(it).toFixed(2)"></span> 到手价｜已补贴¥<span x-text="drugSavedAmount(it).toFixed(2)"></span>
+                            </p>
+                            <p class="text-[10px] text-slate-400 mt-0.5">原价¥<span x-text="drugOriginalPrice(it).toFixed(2)"></span></p>
+                          </template>
+                          <template x-if="!drugShowEquity">
+                            <p class="text-sm font-bold text-red-600 leading-snug">
+                              ¥<span x-text="drugOriginalPrice(it).toFixed(2)"></span> 原价
+                            </p>
+                          </template>
+                        </template>
+                        <template x-if="it.type !== 'drug'">
+                          <p class="text-sm font-bold text-slate-900">¥<span x-text="it.subtotal.toFixed(2)"></span></p>
+                        </template>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+
+              <div class="bg-white rounded-2xl border border-slate-100 p-4">
+                <p class="text-sm font-semibold text-slate-900 mb-3">履约进度</p>
+                <div class="space-y-3 text-xs">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full" :class="activeOrder.status !== 'pending_payment' ? 'bg-brand-600' : 'bg-slate-200'"></span>
+                    <span>订单已创建</span>
                   </div>
-                  <div class="min-w-0 flex-1">
-                    <p class="text-sm font-semibold text-slate-900 line-clamp-2" x-text="it.name"></p>
-                    <p class="text-xs text-slate-500 mt-1"><span x-text="'规格：' + it.spec"></span></p>
-                    <p class="text-xs text-slate-500 mt-1" x-text="'数量：' + it.qty + ' 件'"></p>
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full" :class="['paid','waiting_receipt','completed'].includes(activeOrder.status) ? 'bg-brand-600' : 'bg-slate-200'"></span>
+                    <span>支付完成（演示）</span>
                   </div>
-                  <div class="text-right shrink-0">
-                    <p class="text-sm font-bold text-slate-900">¥<span x-text="it.subtotal.toFixed(2)"></span></p>
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full" :class="['waiting_receipt','completed'].includes(activeOrder.status) ? 'bg-brand-600' : 'bg-slate-200'"></span>
+                    <span>已发货/在途</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full" :class="activeOrder.status === 'completed' ? 'bg-brand-600' : 'bg-slate-200'"></span>
+                    <span>已签收/已完成</span>
                   </div>
                 </div>
-              </template>
-            </div>
-          </div>
-
-          <!-- 时间线（演示） -->
-          <div class="bg-white rounded-2xl border border-slate-100 p-4">
-            <p class="text-sm font-semibold text-slate-900 mb-3">履约进度</p>
-            <div class="space-y-3 text-xs">
-              <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full" :class="activeOrder.status !== 'pending_payment' ? 'bg-brand-600' : 'bg-slate-200'"></span>
-                <span>订单已创建</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full" :class="['paid','waiting_receipt','completed'].includes(activeOrder.status) ? 'bg-brand-600' : 'bg-slate-200'"></span>
-                <span>支付完成（演示）</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full" :class="['waiting_receipt','completed'].includes(activeOrder.status) ? 'bg-brand-600' : 'bg-slate-200'"></span>
-                <span>已发货/在途</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full" :class="activeOrder.status === 'completed' ? 'bg-brand-600' : 'bg-slate-200'"></span>
-                <span>已签收/已完成</span>
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- 底部操作 -->
-        <div class="shrink-0 bg-white border-t border-slate-200 px-3 py-3 safe-pb">
-          <div class="flex gap-2">
-            <button type="button" @click="showService = true" class="w-24 py-2 rounded-xl border border-slate-200 text-sm text-slate-700">
-              客服
-            </button>
-
-            <template x-if="activeOrder.status === 'pending_payment'">
-              <button type="button" @click="payOrder(activeOrder.id)" class="flex-1 py-2 rounded-xl bg-brand-600 text-white text-sm font-semibold">
-                立即支付
-              </button>
-            </template>
-            <template x-if="activeOrder.status === 'paid'">
-              <button type="button" disabled class="flex-1 py-2 rounded-xl bg-slate-100 text-slate-400 text-sm font-semibold">
-                等待发货
-              </button>
-            </template>
-            <template x-if="activeOrder.status === 'waiting_receipt'">
-              <button type="button" @click="confirmReceipt(activeOrder.id)" class="flex-1 py-2 rounded-xl bg-brand-600 text-white text-sm font-semibold">
-                确认收货
-              </button>
-            </template>
-            <template x-if="activeOrder.status === 'completed'">
-              <button type="button" @click="reorderFromActive()" class="flex-1 py-2 rounded-xl bg-brand-600 text-white text-sm font-semibold">
-                再次购买
-              </button>
-            </template>
+            <div class="shrink-0 bg-white border-t border-slate-200 px-3 py-3 safe-pb">
+              <div class="flex gap-2">
+                <button type="button" @click="showService = true" class="w-24 py-2 rounded-xl border border-slate-200 text-sm text-slate-700">
+                  客服
+                </button>
+                <template x-if="activeOrder.status === 'pending_payment'">
+                  <div class="flex-1 flex gap-2">
+                    <button type="button" @click="cancelPendingOrderToClosed(activeOrder.id)" class="flex-1 py-2 rounded-xl border border-slate-300 text-slate-700 text-sm font-medium">
+                      取消订单
+                    </button>
+                    <button type="button" @click="payOrder(activeOrder.id)" class="flex-1 py-2 rounded-xl bg-brand-600 text-white text-sm font-semibold">
+                      立即支付
+                    </button>
+                  </div>
+                </template>
+                <template x-if="activeOrder.status === 'paid'">
+                  <button type="button" disabled class="flex-1 py-2 rounded-xl bg-slate-100 text-slate-400 text-sm font-semibold">
+                    等待发货
+                  </button>
+                </template>
+                <template x-if="activeOrder.status === 'waiting_receipt'">
+                  <button type="button" @click="confirmReceipt(activeOrder.id)" class="flex-1 py-2 rounded-xl bg-brand-600 text-white text-sm font-semibold">
+                    确认收货
+                  </button>
+                </template>
+                <template x-if="activeOrder.status === 'completed'">
+                  <button type="button" @click="reorderAllFromActive()" class="flex-1 py-2 rounded-xl bg-brand-600 text-white text-sm font-semibold">
+                    再次购买
+                  </button>
+                </template>
+              </div>
+            </div>
           </div>
-        </div>
+        </template>
       </div>
     </template>
+
+    <!-- 删除订单二次确认 -->
+    <div x-show="showDeleteOrderConfirm" x-transition.opacity class="fixed inset-0 z-[88] max-w-md mx-auto flex items-center justify-center px-8 bg-black/50" @click.self="showDeleteOrderConfirm = false">
+      <div class="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-xl" @click.stop>
+        <p class="text-center font-bold text-slate-900 pt-6 pb-2 text-base">删除订单</p>
+        <p class="text-center text-sm text-slate-500 px-6 pb-6">确认删除订单吗？</p>
+        <div class="flex border-t border-slate-200">
+          <button type="button" @click="showDeleteOrderConfirm = false" class="flex-1 py-3.5 text-sm text-slate-900 font-medium border-r border-slate-200">取消</button>
+          <button type="button" @click="executeDeleteOrder()" class="flex-1 py-3.5 text-sm font-semibold text-[#007AFF]">确定</button>
+        </div>
+      </div>
+    </div>
 
     <!-- ========== 药诊优享卡：介绍 + 激活 ========== -->
     <template x-if="view === 'cardActivate'">
@@ -392,7 +611,7 @@
           </div>
         </div>
 
-        <div class="px-3 mt-3 relative z-[1] space-y-3 pb-36">
+        <div class="px-3 mt-3 relative z-[1] space-y-3 pb-44 safe-pb">
           <!-- 首屏：激活表单（未激活时显示） -->
           <div class="rounded-2xl bg-white border-2 border-orange-200 shadow-lg p-4" x-show="!drugCardActivated">
             <p class="text-center text-red-600 font-bold text-sm mb-4">◆ 完善信息，激活权益 ◆</p>
@@ -416,7 +635,7 @@
           <!-- 首屏：已激活只展示内容介绍 -->
           <div class="rounded-2xl bg-emerald-50 border border-emerald-200 p-4 text-sm text-emerald-900" x-show="drugCardActivated">
             <p class="font-bold text-base">药诊卡已激活</p>
-            <p class="text-xs text-emerald-700 mt-1">已享受 8 折购药优惠</p>
+            <p class="text-xs text-emerald-700 mt-1">已享受 7 折购药优惠</p>
             <p class="text-xs text-emerald-700 mt-2">已绑定手机号：<span class="font-semibold" x-text="activatePhone"></span></p>
           </div>
 
@@ -507,7 +726,7 @@
         </div>
 
         <!-- 底部固定 CTA -->
-        <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-orange-100 px-3 py-3 safe-pb z-[61] flex items-center gap-2 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+        <div class="fixed bottom-14 left-0 right-0 max-w-md mx-auto bg-white border-t border-orange-100 px-3 py-3 safe-pb z-[61] flex items-center gap-2 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
           <button type="button" @click="showService = true" class="flex flex-col items-center text-[10px] text-slate-500 px-1">
             <span class="text-lg"><i class="ri-headphone-line"></i></span>咨询
           </button>
@@ -528,11 +747,11 @@
     <!-- ========== 设置页 ========== -->
     <template x-if="view === 'settings'">
       <div class="fixed inset-0 z-[55] bg-slate-50 max-w-md mx-auto left-0 right-0 flex flex-col">
-        <header class="flex items-center gap-3 px-4 py-3 bg-white border-b border-slate-100">
+        <header class="shrink-0 flex items-center gap-3 px-4 py-3 bg-white border-b border-slate-100">
           <button type="button" @click="view = 'main'; subView = ''" class="p-2 -ml-2 rounded-xl">←</button>
           <h1 class="font-semibold text-lg">设置</h1>
         </header>
-        <div class="p-4 space-y-2">
+        <div class="flex-1 overflow-y-auto p-4 pb-24 space-y-2 safe-pb">
           <button type="button" class="w-full flex justify-between items-center bg-white rounded-2xl px-4 py-4 border border-slate-100 text-left">
             <span>消息通知</span>
             <span class="text-slate-400 text-sm">已开启</span>
@@ -546,17 +765,417 @@
       </div>
     </template>
 
+    <!-- ========== 精选推荐：二级页 ========== -->
+    <template x-if="view === 'recommendList'">
+      <div class="fixed inset-0 z-[58] bg-[#f2f2f2] max-w-md mx-auto left-0 right-0 flex flex-col">
+        <header class="shrink-0 bg-white border-b border-slate-100 px-3 py-3 flex items-center">
+          <button type="button" @click="closeRecommendList()" class="w-9 h-9 -ml-1 rounded-xl text-slate-700 text-xl" aria-label="返回">
+            <i class="ri-arrow-left-s-line"></i>
+          </button>
+          <h1 class="flex-1 text-center text-lg font-semibold text-slate-900 pr-8">精选推荐</h1>
+        </header>
+        <div class="flex-1 overflow-y-auto p-3 pb-24 safe-pb">
+          <div class="grid grid-cols-2 gap-3">
+            <template x-for="d in recommendDrugs" :key="'rec-' + d.id">
+              <div class="bg-white rounded-3xl p-3 shadow-sm border border-slate-100 flex flex-col">
+                <button type="button" @click="openDrug(d)" aria-label="查看商品详情" class="rounded-2xl bg-slate-50 h-36 w-full flex items-center justify-center overflow-hidden">
+                  <img :src="d.thumb" alt="" class="w-[88%] h-[72%] object-contain pointer-events-none" />
+                </button>
+                <p class="text-[10px] text-slate-500 mt-2">
+                  <span class="px-1.5 py-0.5 rounded border text-[9px]" :class="(d.drugKind || 'otc') === 'rx' ? 'border-amber-300 bg-amber-50 text-amber-800' : 'border-slate-200 bg-slate-50 text-slate-600'" x-text="(d.drugKind || 'otc') === 'rx' ? '处方药' : '非处方药'"></span>
+                </p>
+                <button type="button" @click="openDrug(d)" class="text-left w-full mt-1 min-h-[2.9rem] rounded-lg -mx-0.5 px-0.5 py-0.5 text-[11px] leading-snug text-slate-800 font-semibold hover:text-brand-600 active:bg-slate-50 transition-colors">
+                  <span class="line-clamp-2 block" x-text="d.name"></span>
+                </button>
+                <div class="mt-2">
+                  <template x-if="!drugShowEquity">
+                    <div class="leading-tight">
+                      <p class="text-red-600 font-bold text-lg">¥<span x-text="drugOriginalPrice(d).toFixed(2)"></span><span class="text-[11px] font-medium text-red-500 ml-0.5">原价</span></p>
+                      <p class="text-red-500 font-semibold text-sm mt-0.5">¥?<span class="text-[11px] font-medium ml-0.5">权益价</span></p>
+                    </div>
+                  </template>
+                  <template x-if="drugShowEquity">
+                    <div class="leading-tight">
+                      <p class="text-red-600 font-bold text-lg">¥<span x-text="drugEquityPrice(d).toFixed(2)"></span><span class="text-[11px] font-medium text-red-500 ml-0.5">补贴价</span></p>
+                      <p class="mt-1 inline-flex items-center px-2 py-0.5 rounded-md text-[11px] text-red-500 border border-red-200 bg-red-50">已补 ¥<span x-text="drugSavedAmount(d).toFixed(2)"></span></p>
+                    </div>
+                  </template>
+                </div>
+                <button type="button" @click.stop="addToCart(d)" class="mt-2 w-full py-2 rounded-full bg-red-500 text-white text-[11px] font-semibold">立即抢购 ></button>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- ========== 快捷导航药品列表：感冒发烧/儿童用药 ========== -->
+    <template x-if="view === 'shortcutDrugList'">
+      <div class="fixed inset-0 z-[58] bg-[#f2f2f2] max-w-md mx-auto left-0 right-0 flex flex-col">
+        <header class="shrink-0 bg-white border-b border-slate-100 px-3 py-3 flex items-center">
+          <button type="button" @click="closeShortcutDrugList()" class="w-9 h-9 -ml-1 rounded-xl text-slate-700 text-xl" aria-label="返回">
+            <i class="ri-arrow-left-s-line"></i>
+          </button>
+          <h1 class="flex-1 text-center text-lg font-semibold text-slate-900 pr-8" x-text="shortcutDrugTitle"></h1>
+        </header>
+        <div class="flex-1 overflow-y-auto p-3 pb-24 safe-pb">
+          <div class="grid grid-cols-2 gap-3">
+            <template x-for="d in shortcutDrugItems" :key="'sdl-' + d.id">
+              <div class="bg-white rounded-3xl p-3 shadow-sm border border-slate-100 flex flex-col">
+                <button type="button" @click="openDrug(d)" aria-label="查看商品详情" class="rounded-2xl bg-slate-50 h-36 w-full flex items-center justify-center overflow-hidden">
+                  <img :src="d.thumb" alt="" class="w-[88%] h-[72%] object-contain pointer-events-none" />
+                </button>
+                <p class="text-[10px] text-slate-500 mt-2">
+                  <span class="px-1.5 py-0.5 rounded border text-[9px]" :class="(d.drugKind || 'otc') === 'rx' ? 'border-amber-300 bg-amber-50 text-amber-800' : 'border-slate-200 bg-slate-50 text-slate-600'" x-text="(d.drugKind || 'otc') === 'rx' ? '处方药' : '非处方药'"></span>
+                </p>
+                <button type="button" @click="openDrug(d)" class="text-left w-full mt-1 min-h-[2.9rem] rounded-lg -mx-0.5 px-0.5 py-0.5 text-[11px] leading-snug text-slate-800 font-semibold hover:text-brand-600 active:bg-slate-50 transition-colors">
+                  <span class="line-clamp-2 block" x-text="d.name"></span>
+                </button>
+                <div class="mt-2">
+                  <template x-if="!drugShowEquity">
+                    <div class="leading-tight">
+                      <p class="text-red-600 font-bold text-lg">¥<span x-text="drugOriginalPrice(d).toFixed(2)"></span><span class="text-[11px] font-medium text-red-500 ml-0.5">原价</span></p>
+                      <p class="text-red-500 font-semibold text-sm mt-0.5">¥?<span class="text-[11px] font-medium ml-0.5">权益价</span></p>
+                    </div>
+                  </template>
+                  <template x-if="drugShowEquity">
+                    <div class="leading-tight">
+                      <p class="text-red-600 font-bold text-lg">¥<span x-text="drugEquityPrice(d).toFixed(2)"></span><span class="text-[11px] font-medium text-red-500 ml-0.5">补贴价</span></p>
+                      <p class="mt-1 inline-flex items-center px-2 py-0.5 rounded-md text-[11px] text-red-500 border border-red-200 bg-red-50">已补 ¥<span x-text="drugSavedAmount(d).toFixed(2)"></span></p>
+                    </div>
+                  </template>
+                </div>
+                <button type="button" @click.stop="addToCart(d)" class="mt-2 w-full py-2 rounded-full bg-red-500 text-white text-[11px] font-semibold">立即抢购 ></button>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- ========== 专题位：二级页 ========== -->
+    <template x-if="view === 'topicList' && activeTopicSection">
+      <div class="fixed inset-0 z-[58] bg-[#f2f2f2] max-w-md mx-auto left-0 right-0 flex flex-col">
+        <header class="shrink-0 bg-white border-b border-slate-100 px-3 py-3 flex items-center">
+          <button type="button" @click="closeTopicSection()" class="w-9 h-9 -ml-1 rounded-xl text-slate-700 text-xl" aria-label="返回">
+            <i class="ri-arrow-left-s-line"></i>
+          </button>
+          <h1 class="flex-1 text-center text-lg font-semibold text-slate-900 pr-8" x-text="activeTopicSection.title"></h1>
+        </header>
+        <div class="flex-1 overflow-y-auto p-3 pb-24 space-y-3 safe-pb">
+          <template x-if="activeTopicSection.id === 'medicine-plan'">
+            <div class="space-y-3">
+              <div class="rounded-2xl overflow-hidden bg-gradient-to-b from-violet-500 to-indigo-600 text-white p-4">
+                <p class="text-2xl font-black leading-tight">国民药品保障计划</p>
+                <p class="text-xs opacity-90 mt-1">解决购药难 购药贵的问题</p>
+                <div class="mt-3 rounded-xl bg-white/15 px-3 py-2 text-[11px]">药品品种多 · 覆盖科室广 · 药品单价低</div>
+                <div class="mt-3 rounded-xl bg-white/10 p-2 h-28 overflow-hidden">
+                  <img src="./thumbnails/cold-pudilan.png" alt="" class="w-full h-full object-cover rounded-lg" />
+                </div>
+              </div>
+              <div class="rounded-2xl bg-white border border-slate-100 p-3">
+                <p class="text-sm font-bold text-slate-900">家庭常备药品保障</p>
+                <p class="text-xs text-slate-500 mt-1">日常生活中经常会用到的药品及器械</p>
+              </div>
+              <div class="grid grid-cols-3 gap-2">
+                <template x-for="it in activeTopicSection.items" :key="activeTopicSection.id + '-' + it.name">
+                  <div class="bg-white rounded-xl border border-slate-100 overflow-hidden">
+                    <button type="button" @click="openDrug(topicItemAsDrug(it))" class="h-24 w-full bg-slate-100 overflow-hidden block">
+                      <img :src="it.thumb" alt="" class="w-full h-full object-cover" />
+                    </button>
+                    <div class="p-1.5">
+                      <p class="text-[9px] text-slate-500">
+                        <span class="px-1 py-0.5 rounded border" :class="(it.drugKind || 'otc') === 'rx' ? 'border-amber-300 bg-amber-50 text-amber-800' : 'border-slate-200 bg-slate-50 text-slate-600'" x-text="(it.drugKind || 'otc') === 'rx' ? '处方药' : '非处方药'"></span>
+                      </p>
+                      <p class="text-[10px] text-slate-700 line-clamp-2 min-h-[2.1rem] mt-1" x-text="it.name"></p>
+                      <div class="mt-1">
+                        <template x-if="!drugShowEquity">
+                          <div class="leading-tight">
+                            <p class="text-red-600 text-sm font-bold">¥<span x-text="topicItemOriginal(it).toFixed(2)"></span><span class="text-[10px] font-medium ml-0.5">原价</span></p>
+                            <p class="text-red-500 text-xs mt-0.5">¥?<span class="text-[10px] font-medium ml-0.5">权益价</span></p>
+                          </div>
+                        </template>
+                        <template x-if="drugShowEquity">
+                          <div class="leading-tight">
+                            <p class="text-red-600 text-sm font-bold">¥<span x-text="topicItemEquity(it).toFixed(2)"></span><span class="text-[10px] font-medium ml-0.5">补贴价</span></p>
+                            <p class="text-[10px] text-red-400 mt-0.5">已补 ¥<span x-text="topicItemSaved(it).toFixed(2)"></span></p>
+                          </div>
+                        </template>
+                      </div>
+                      <button type="button" @click.stop="addTopicItemToCart(it)" class="w-full mt-1 py-1 rounded-full bg-red-500 text-white text-[10px] font-semibold">立即抢购 ></button>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </template>
+
+          <template x-if="activeTopicSection.id !== 'medicine-plan'">
+            <div class="grid grid-cols-2 gap-3">
+              <template x-for="it in activeTopicSection.items" :key="activeTopicSection.id + '-' + it.name">
+                <div class="bg-white rounded-2xl border border-slate-100 p-2.5 flex flex-col">
+                  <button type="button" @click="openDrug(topicItemAsDrug(it))" class="rounded-xl bg-slate-50 h-28 overflow-hidden flex items-center justify-center">
+                    <img :src="it.thumb" alt="" class="w-full h-full object-cover" />
+                  </button>
+                  <p class="text-[10px] text-slate-500 mt-2">
+                    <span class="px-1.5 py-0.5 rounded border text-[9px]" :class="(it.drugKind || 'otc') === 'rx' ? 'border-amber-300 bg-amber-50 text-amber-800' : 'border-slate-200 bg-slate-50 text-slate-600'" x-text="(it.drugKind || 'otc') === 'rx' ? '处方药' : '非处方药'"></span>
+                  </p>
+                  <p class="text-[11px] text-slate-700 mt-1 line-clamp-2 min-h-[2.1rem]" x-text="it.name"></p>
+                  <div class="mt-2 flex-1">
+                    <template x-if="!drugShowEquity">
+                      <div class="leading-tight">
+                        <p class="text-red-600 font-bold text-lg">¥<span x-text="topicItemOriginal(it).toFixed(2)"></span><span class="text-[11px] font-medium ml-0.5">原价</span></p>
+                        <p class="text-red-500 text-sm mt-0.5">¥?<span class="text-[11px] font-medium ml-0.5">权益价</span></p>
+                      </div>
+                    </template>
+                    <template x-if="drugShowEquity">
+                      <div class="leading-tight">
+                        <p class="text-red-600 font-bold text-lg">¥<span x-text="topicItemEquity(it).toFixed(2)"></span><span class="text-[11px] font-medium ml-0.5">补贴价</span></p>
+                        <p class="mt-1 inline-flex items-center px-2 py-0.5 rounded-md text-[11px] text-red-500 border border-red-200 bg-red-50">已补 ¥<span x-text="topicItemSaved(it).toFixed(2)"></span></p>
+                      </div>
+                    </template>
+                  </div>
+                  <button type="button" @click.stop="addTopicItemToCart(it)" class="mt-2 w-full py-2 rounded-full bg-red-500 text-white text-[11px] font-semibold">立即抢购 ></button>
+                </div>
+              </template>
+            </div>
+          </template>
+        </div>
+      </div>
+    </template>
+
+    <!-- ========== 家庭常备：二级页 ========== -->
+    <template x-if="view === 'familyReserve'">
+      <div class="fixed inset-0 z-[58] bg-[#f2f2f2] max-w-md mx-auto left-0 right-0 flex flex-col">
+        <header class="shrink-0 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-3 py-3 flex items-center">
+          <button type="button" @click="closeFamilyReserve()" class="w-9 h-9 -ml-1 rounded-xl text-white text-xl" aria-label="返回">
+            <i class="ri-arrow-left-s-line"></i>
+          </button>
+          <h1 class="flex-1 text-center text-lg font-semibold pr-8">家庭常备</h1>
+        </header>
+        <div class="shrink-0 px-3 pt-2 pb-2 bg-[#b8ef68]">
+          <div class="h-14 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-white flex items-center justify-center text-lg font-bold">家庭常备 · 专业药师 专业指导</div>
+        </div>
+        <div class="flex-1 overflow-y-auto p-2 pb-24 safe-pb">
+          <div class="grid grid-cols-3 gap-2">
+            <template x-for="d in familyReserveDrugs" :key="'fr-' + d.id">
+              <div class="bg-white rounded-xl overflow-hidden border border-slate-100">
+                <button type="button" @click="openDrug(d)" aria-label="查看商品详情" class="h-24 w-full bg-slate-100 overflow-hidden block">
+                  <img :src="d.thumb" alt="" class="w-full h-full object-cover pointer-events-none" />
+                </button>
+                <div class="p-1.5">
+                  <p class="text-[9px] text-slate-500">
+                    <span class="px-1 py-0.5 rounded border" :class="(d.drugKind || 'otc') === 'rx' ? 'border-amber-300 bg-amber-50 text-amber-800' : 'border-slate-200 bg-slate-50 text-slate-600'" x-text="(d.drugKind || 'otc') === 'rx' ? '处方药' : '非处方药'"></span>
+                  </p>
+                  <button type="button" @click="openDrug(d)" class="text-left w-full mt-1 min-h-[2.1rem] rounded-md -mx-0.5 px-0.5 py-0.5 text-[10px] text-slate-700 hover:text-brand-600 active:bg-slate-50 transition-colors">
+                    <span class="line-clamp-2 block" x-text="d.name"></span>
+                  </button>
+                  <div class="mt-1">
+                    <template x-if="!drugShowEquity">
+                      <div class="leading-tight">
+                        <p class="text-red-600 text-sm font-bold">¥<span x-text="drugOriginalPrice(d).toFixed(2)"></span><span class="text-[10px] font-medium ml-0.5">原价</span></p>
+                        <p class="text-red-500 text-xs mt-0.5">¥?<span class="text-[10px] font-medium ml-0.5">权益价</span></p>
+                      </div>
+                    </template>
+                    <template x-if="drugShowEquity">
+                      <div class="leading-tight">
+                        <p class="text-red-600 text-sm font-bold">¥<span x-text="drugEquityPrice(d).toFixed(2)"></span><span class="text-[10px] font-medium ml-0.5">补贴价</span></p>
+                        <p class="text-[10px] text-red-400 mt-0.5">已补 ¥<span x-text="drugSavedAmount(d).toFixed(2)"></span></p>
+                      </div>
+                    </template>
+                  </div>
+                  <button type="button" @click.stop="addToCart(d)" class="w-full mt-1 py-1 rounded-full bg-red-500 text-white text-[10px] font-semibold">立即抢购 ></button>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- ========== 处方药：完善问诊处方信息（结算前） ========== -->
+    <template x-if="view === 'rxCheckout'">
+      <div class="fixed inset-0 z-[60] bg-[#f4f4f5] max-w-md mx-auto left-0 right-0 flex flex-col">
+        <header class="shrink-0 flex items-center gap-2 px-3 py-3 bg-[#6B5BC8] text-white">
+          <button type="button" @click="closeRxCheckout()" class="p-2 -ml-1 rounded-xl text-white/95 text-xl" aria-label="返回">
+            <i class="ri-arrow-left-s-line"></i>
+          </button>
+          <h1 class="font-semibold text-base flex-1 text-center pr-8">完善问诊处方信息</h1>
+        </header>
+        <!-- 流程说明 -->
+        <div class="shrink-0 bg-sky-50 border-b border-sky-100 px-2 py-2.5">
+          <div class="flex items-center justify-between text-[10px] text-sky-800 font-medium text-center">
+            <span class="flex-1 px-0.5" :class="rxCheckoutStep === 1 ? 'text-sky-700 font-bold' : 'text-sky-500'">填写信息</span>
+            <span class="text-sky-300">›</span>
+            <span class="flex-1 px-0.5" :class="rxCheckoutStep === 2 ? 'text-sky-700 font-bold' : 'text-sky-500'">开立处方</span>
+            <span class="text-sky-300">›</span>
+            <span class="flex-1 px-0.5 text-sky-500">下单支付</span>
+            <span class="text-sky-300">›</span>
+            <span class="flex-1 px-0.5 text-sky-500">到店/发货</span>
+          </div>
+        </div>
+        <div class="flex-1 overflow-y-auto px-3 pt-3 pb-52 space-y-3 safe-pb">
+          <div x-show="rxCheckoutStep === 1" class="space-y-3">
+            <div class="rounded-lg bg-amber-50 border border-amber-100 px-3 py-2 flex items-start gap-2 text-[11px] text-amber-900">
+              <i class="ri-shield-check-line text-amber-600 text-base shrink-0 mt-0.5"></i>
+              <span>请完善您的问诊信息，用于医生诊断并开具处方</span>
+            </div>
+            <!-- 用药患者 -->
+            <div class="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+              <p class="px-3 pt-3 text-sm font-bold text-slate-900">用药患者</p>
+              <button type="button" @click="openRxPatientSelect()" class="w-full text-left px-3 py-3 flex items-center gap-3 active:bg-slate-50">
+                <div class="flex-1 min-w-0">
+                  <template x-if="!rxActivePatient">
+                    <p class="text-sm text-slate-400">请选择用药患者</p>
+                  </template>
+                  <template x-if="rxActivePatient">
+                    <p class="text-sm font-semibold text-slate-900" x-text="rxActivePatient.name"></p>
+                    <p class="text-xs text-slate-500 mt-1">
+                      <span x-text="(rxActivePatient.age != null && rxActivePatient.age !== '') ? (rxActivePatient.age + '岁') : ''"></span>
+                      <span class="mx-1" x-text="rxActivePatient.gender"></span>
+                      <i class="ri-women-line align-middle text-sm text-pink-400" x-show="rxActivePatient.gender === '女'"></i>
+                      <i class="ri-men-line align-middle text-sm text-sky-500" x-show="rxActivePatient.gender !== '女'"></i>
+                      <span class="ml-2" x-text="rxActivePatient.phoneDisplay"></span>
+                    </p>
+                  </template>
+                </div>
+                <i class="ri-arrow-right-s-line text-slate-300 text-lg shrink-0"></i>
+              </button>
+              <div class="px-3 pb-3">
+                <button type="button" @click="openRxAddPatient('checkout')" class="text-xs text-[#6B5BC8] font-medium">+ 新建用药人</button>
+              </div>
+            </div>
+            <!-- 确诊疾病（每个处方药） -->
+            <template x-for="line in selectedRxDrugItems" :key="'rxdis-' + line.id">
+              <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-3">
+                <p class="text-sm font-bold text-slate-900"><span class="text-red-500">*</span> 请选择线下已确诊疾病</p>
+                <p class="text-[11px] text-slate-500 mt-1">每个药品请选择一种疾病</p>
+                <div class="flex gap-2 mt-3">
+                  <div class="w-14 h-14 rounded-lg bg-slate-100 shrink-0 overflow-hidden">
+                    <img :src="line.thumb" alt="" class="w-full h-full object-cover" />
+                  </div>
+                  <p class="text-xs text-slate-800 leading-snug flex-1 min-w-0" x-text="line.name"></p>
+                </div>
+                <div class="flex flex-wrap gap-2 mt-3">
+                  <template x-for="tag in rxDiseaseOptions" :key="line.id + '-' + tag">
+                    <button type="button"
+                            @click="setRxDiseaseForItem(line.id, tag)"
+                            class="px-2.5 py-1.5 rounded-lg text-xs font-medium border transition"
+                            :class="rxDiseaseByItemId[line.id] === tag ? 'bg-[#3B82F6] text-white border-[#3B82F6]' : 'bg-slate-50 text-slate-700 border-slate-200'"
+                            x-text="tag"></button>
+                  </template>
+                  <button type="button" @click="toast('添加疾病（演示）')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-dashed border-slate-300 text-slate-500">+ 添加疾病</button>
+                </div>
+              </div>
+            </template>
+            <!-- 上传 -->
+            <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-3">
+              <p class="text-sm font-bold text-slate-900">处方/病例/检查报告</p>
+              <p class="text-[11px] text-slate-500 mt-1">选填，最多5张</p>
+              <div class="flex flex-wrap gap-2 mt-3">
+                <template x-for="i in rxUploadCount" :key="'rxu-' + i">
+                  <div class="w-16 h-16 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] text-slate-400">图<span x-text="i"></span></div>
+                </template>
+                <button type="button" x-show="rxUploadCount < 5" @click="rxConsultTapUpload()" class="w-16 h-16 rounded-lg border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400 text-2xl leading-none">+</button>
+              </div>
+            </div>
+          </div>
+          <div x-show="rxCheckoutStep === 2" class="space-y-3">
+            <div class="rounded-xl bg-white border border-slate-100 p-4 text-sm shadow-sm">
+              <p class="font-semibold text-slate-900">问诊结果（演示）</p>
+              <p class="text-slate-600 mt-2 leading-relaxed text-xs">医生已根据您提交的线下确诊信息完成评估，可开具电子处方用于本次购药。</p>
+            </div>
+            <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm">
+              <p class="font-semibold text-emerald-900">电子处方</p>
+              <p class="text-xs text-emerald-800 mt-1">处方编号：<span class="font-mono">RX202604020001</span></p>
+              <p class="text-xs text-emerald-800 mt-2 leading-relaxed">请按处方与说明书用药；如症状加重请及时线下就诊。</p>
+            </div>
+          </div>
+        </div>
+        <!-- 底部同意 + 主按钮 -->
+        <div class="fixed bottom-14 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 px-3 pt-3 pb-3 safe-pb z-[61] shadow-[0_-4px_20px_rgba(0,0,0,0.06)] space-y-3">
+          <div x-show="rxCheckoutStep === 1" class="space-y-3">
+            <label class="flex items-start gap-2 text-[10px] text-slate-600 leading-relaxed cursor-pointer">
+              <input type="checkbox" x-model="rxAgreementChecked" class="mt-0.5 rounded border-slate-300 text-[#3B82F6] w-4 h-4 shrink-0" />
+              <span>确认已在线下就诊确诊，对本次用药无过敏史，已阅读并同意<span class="text-[#3B82F6]">《互联网诊疗风险告知及知情同意书》</span>（演示）</span>
+            </label>
+            <button type="button" @click="startRxConsultation()" class="w-full py-3.5 rounded-full bg-[#3B82F6] text-white text-sm font-semibold shadow-md active:opacity-95">免费问诊并开方</button>
+          </div>
+          <button type="button" x-show="rxCheckoutStep === 2" @click="finishRxCheckout()" class="w-full py-3.5 rounded-full bg-[#3B82F6] text-white text-sm font-semibold shadow-md">下一步：填写收货信息</button>
+        </div>
+      </div>
+    </template>
+
+    <!-- ========== 选择用药人 ========== -->
+    <template x-if="view === 'rxPatientSelect'">
+      <div class="fixed inset-0 z-[61] bg-[#f4f4f5] max-w-md mx-auto left-0 right-0 flex flex-col">
+        <header class="shrink-0 flex items-center gap-2 px-3 py-3 bg-[#6B5BC8] text-white">
+          <button type="button" @click="view = 'rxCheckout'" class="p-2 -ml-1 rounded-xl text-white/95 text-xl" aria-label="返回"><i class="ri-arrow-left-s-line"></i></button>
+          <h1 class="font-semibold text-base flex-1 text-center pr-8">选择用药人</h1>
+        </header>
+        <div class="flex-1 overflow-y-auto p-3 pb-28 space-y-3 safe-pb">
+          <template x-for="p in rxPatients" :key="p.id">
+            <button type="button" @click="pickRxPatient(p.id)" class="w-full text-left bg-white rounded-xl border px-4 py-4 flex items-center justify-between shadow-sm"
+                    :class="rxSelectedPatientId === p.id ? 'border-[#6B5BC8] ring-1 ring-[#6B5BC8]' : 'border-slate-100'">
+              <div>
+                <p class="font-semibold text-slate-900" x-text="p.name"></p>
+                <p class="text-xs text-slate-500 mt-1" x-text="p.phoneDisplay"></p>
+              </div>
+              <i class="ri-checkbox-circle-fill text-xl" :class="rxSelectedPatientId === p.id ? 'text-[#6B5BC8]' : 'text-slate-200'"></i>
+            </button>
+          </template>
+          <button type="button" @click="openRxAddPatient('picker')" class="w-full py-3 rounded-xl border-2 border-dashed border-[#6B5BC8] text-[#6B5BC8] text-sm font-semibold">+ 新建用药人</button>
+        </div>
+      </div>
+    </template>
+
+    <!-- ========== 新建用药人 ========== -->
+    <template x-if="view === 'rxAddPatient'">
+      <div class="fixed inset-0 z-[61] bg-[#f4f4f5] max-w-md mx-auto left-0 right-0 flex flex-col">
+        <header class="shrink-0 flex items-center gap-2 px-3 py-3 bg-[#6B5BC8] text-white">
+          <button type="button" @click="closeRxAddPatient()" class="p-2 -ml-1 rounded-xl text-white/95 text-xl" aria-label="返回"><i class="ri-arrow-left-s-line"></i></button>
+          <h1 class="font-semibold text-base flex-1 text-center pr-8">新建用药人</h1>
+        </header>
+        <div class="shrink-0 bg-amber-50 border-b border-amber-100 px-3 py-2 flex items-start gap-2 text-[11px] text-amber-900">
+          <i class="ri-shield-check-line text-amber-600 shrink-0"></i>
+          <span>处方药需实名预约，平台会保护您的隐私安全</span>
+        </div>
+        <div class="flex-1 overflow-y-auto px-3 py-4 pb-36 space-y-0 bg-white">
+          <div class="flex items-center py-3 border-b border-slate-100 gap-3">
+            <span class="text-sm text-slate-700 w-24 shrink-0"><span class="text-red-500">*</span>真实姓名</span>
+            <input type="text" x-model="rxNewName" placeholder="请输入" class="flex-1 text-sm outline-none text-right placeholder:text-slate-300" />
+          </div>
+          <div class="flex items-center py-3 border-b border-slate-100 gap-3">
+            <span class="text-sm text-slate-700 w-24 shrink-0"><span class="text-red-500">*</span>身份证</span>
+            <input type="text" x-model="rxNewIdCard" placeholder="请输入" class="flex-1 text-sm outline-none text-right placeholder:text-slate-300" />
+          </div>
+          <div class="flex items-center py-3 border-b border-slate-100 gap-3">
+            <span class="text-sm text-slate-700 w-24 shrink-0"><span class="text-red-500">*</span>手机号</span>
+            <input type="tel" x-model="rxNewPhone" placeholder="请输入" class="flex-1 text-sm outline-none text-right placeholder:text-slate-300" />
+          </div>
+          <button type="button" class="w-full flex items-center py-3 border-b border-slate-100 text-left">
+            <span class="text-sm text-slate-700">健康信息</span>
+            <span class="flex-1 text-right text-sm text-slate-500 truncate px-2" x-text="rxNewHealth"></span>
+            <i class="ri-arrow-down-s-line text-slate-400"></i>
+          </button>
+        </div>
+        <div class="fixed bottom-14 left-0 right-0 max-w-md mx-auto px-4 py-3 safe-pb z-[61] bg-white border-t border-slate-100">
+          <button type="button" @click="saveRxNewPatient()" class="w-full py-3.5 rounded-full bg-[#3B82F6] text-white text-sm font-semibold">保存并使用</button>
+        </div>
+      </div>
+    </template>
+
     <!-- ========== 主框架：首页 / 购物车 / 个人中心 ========== -->
     <template x-if="view === 'main' && !detailPage">
       <div>
         <!-- 首页 -->
-        <div x-show="tab === 'home'" class="pb-4">
+        <div x-show="tab === 'home'" class="pb-24">
           <!-- 顶栏 -->
           <header class="sticky top-0 z-20 bg-white/95 backdrop-blur border-b border-slate-100 px-3 pt-2 pb-3">
             <div class="flex items-center gap-2">
               <div class="shrink-0 w-9 h-9 rounded-xl bg-brand-500 text-white text-xs font-bold flex items-center justify-center">商城</div>
               <div class="flex-1 relative">
-                <input type="search" readonly @click="alert('演示：搜索功能')" placeholder="请输入您要搜索的药品名称" class="w-full rounded-full bg-slate-100 border-0 py-2.5 pl-9 pr-3 text-sm text-slate-600 placeholder:text-slate-400 outline-none" />
+                <input type="search" readonly @click="openSearch()" placeholder="请输入您要搜索的药品名称" class="w-full rounded-full bg-slate-100 border-0 py-2.5 pl-9 pr-3 text-sm text-slate-600 placeholder:text-slate-400 outline-none" />
                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"><i class="ri-search-line"></i></span>
               </div>
               <button type="button" @click="showService = true" class="shrink-0 w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600" aria-label="客服热线">
@@ -565,23 +1184,19 @@
             </div>
           </header>
 
-          <!-- 药诊卡待激活引导（登录/激活状态驱动） -->
-          <div x-show="!loggedIn || (loggedIn && !drugCardActivated)" class="mx-3 mt-2 rounded-2xl border border-orange-100 bg-gradient-to-r from-orange-50 to-amber-50 p-3">
-            <div class="flex items-start justify-between gap-3">
-              <div class="min-w-0">
-                <p class="text-sm font-bold text-slate-900" x-show="!loggedIn">待激活 · 登录后享 8 折</p>
-                <p class="text-sm font-bold text-slate-900" x-show="loggedIn && !drugCardActivated">药诊卡未激活 · 按原价购买</p>
-                <p class="text-xs text-slate-600 mt-1" x-show="!loggedIn">未登录不可加购药品</p>
-                <p class="text-xs text-slate-600 mt-1" x-show="loggedIn && !drugCardActivated">已登录可加购，但未激活无优惠</p>
+          <!-- 药诊卡入口条（上移） -->
+          <div class="px-3 mt-3">
+            <button type="button" @click="view = 'cardActivate'; activatePhone = loginPhone" class="w-full rounded-2xl bg-gradient-to-r from-red-500 to-orange-500 text-white text-left px-4 py-3 shadow-md shadow-orange-200/50 flex items-center justify-between active:opacity-95">
+              <div>
+                <p class="text-sm font-bold">药诊优享卡</p>
+                <p class="text-[11px] opacity-90 mt-0.5">问诊购药最高补贴70% · 点击了解并激活</p>
               </div>
-              <button type="button" @click="goActivateFromBanner()" class="shrink-0 px-3 py-1.5 rounded-full bg-orange-500 text-white text-xs font-semibold active:opacity-90">
-                去激活
-              </button>
-            </div>
+              <span class="text-xs bg-white/20 px-2 py-1 rounded-lg">去激活</span>
+            </button>
           </div>
 
           <!-- 快速访问 -->
-          <div class="px-3 pt-3 grid grid-cols-4 gap-2 text-center text-xs">
+          <div class="px-3 pt-3 grid grid-cols-2 gap-2 text-center text-xs">
             <template x-for="(q, i) in quickAccess" :key="i">
               <button type="button" class="py-2 rounded-xl bg-white border border-slate-100 shadow-sm active:scale-[0.98] transition" @click="onQuickAccess(q)">
                 <span class="block text-lg mb-0.5"><i :class="q.icon"></i></span>
@@ -606,7 +1221,7 @@
           <div class="px-3 mt-4">
             <div class="grid grid-cols-4 gap-y-3 gap-x-2 text-center text-xs text-slate-700">
               <template x-for="(c, i) in categories8" :key="i">
-                <button type="button" class="flex flex-col items-center gap-1 active:opacity-70" @click="toast(c.name)">
+                <button type="button" class="flex flex-col items-center gap-1 active:opacity-70" @click="onCategoryShortcut(c)">
                   <span class="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-lg shadow-inner text-slate-600"><i :class="c.icon"></i></span>
                   <span x-text="c.name"></span>
                 </button>
@@ -614,12 +1229,37 @@
             </div>
           </div>
 
-          <!-- 组合购药 · 首页列表（三列） -->
+          <!-- 专题位（2x2） -->
+          <div class="px-3 mt-4">
+            <div class="grid grid-cols-2 gap-3">
+              <template x-for="topic in topicSections" :key="topic.id">
+                <button type="button" @click="openTopicSection(topic)" class="text-left rounded-3xl p-3 border shadow-sm" :class="topic.cardClass">
+                  <div class="flex items-center justify-between">
+                    <p class="font-bold text-[18px] leading-none" :class="topic.titleClass" x-text="topic.title"></p>
+                    <span class="text-xl leading-none" :class="topic.titleClass">›</span>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2 mt-3">
+                    <template x-for="it in topic.items.slice(0,2)" :key="topic.id + '-home-' + it.name">
+                      <div>
+                        <div class="h-24 rounded-lg overflow-hidden bg-white/70">
+                          <img :src="it.thumb" alt="" class="w-full h-full object-cover" />
+                        </div>
+                        <p class="mt-1 text-center rounded-full border text-[10px] py-0.5" :class="it.highlight ? 'text-white bg-red-500 border-red-500' : 'text-red-500 border-red-200 bg-red-50'" x-text="'已补' + it.subsidy"></p>
+                        <p class="text-center text-red-600 text-2xl font-bold leading-none mt-1">¥<span x-text="it.price"></span></p>
+                      </div>
+                    </template>
+                  </div>
+                </button>
+              </template>
+            </div>
+          </div>
+
+          <!-- 药品组合包（保留原区域） -->
           <div class="px-3 mt-4">
             <div class="rounded-xl bg-white border border-orange-100 overflow-hidden shadow-sm">
               <div class="bg-gradient-to-b from-orange-50 to-white px-3 pt-3 pb-2 flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <h2 class="text-lg font-bold text-slate-900">组合购药</h2>
+                  <h2 class="text-lg font-bold text-slate-900">药品组合包</h2>
                   <span class="text-[10px] font-semibold text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full flex items-center gap-0.5">0元购<span class="text-orange-500"><i class="ri-fire-line"></i></span></span>
                 </div>
                 <button type="button" @click="openComboPurchaseList()" class="text-xs text-brand-600 font-medium">更多</button>
@@ -638,141 +1278,7 @@
             </div>
           </div>
 
-          <!-- 药诊卡入口条 -->
-          <div class="px-3 mt-4">
-            <button type="button" @click="view = 'cardActivate'; activatePhone = loginPhone" class="w-full rounded-2xl bg-gradient-to-r from-red-500 to-orange-500 text-white text-left px-4 py-3 shadow-md shadow-orange-200/50 flex items-center justify-between active:opacity-95">
-              <div>
-                <p class="text-sm font-bold">药诊优享卡</p>
-                <p class="text-[11px] opacity-90 mt-0.5">问诊购药最高补贴70% · 点击了解并激活</p>
-              </div>
-              <span class="text-xs bg-white/20 px-2 py-1 rounded-lg">去查看</span>
-            </button>
-          </div>
-
-          <!-- 专题类目 · 热卖榜 -->
-          <div class="px-3 mt-6">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-[10px] font-semibold uppercase tracking-wider text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded-md">专题类目</span>
-            </div>
-            <div class="flex items-center justify-between mb-3">
-              <h2 class="text-lg font-bold text-slate-900">热卖榜</h2>
-              <button type="button" @click="toast('更多热卖')" class="text-xs text-brand-600 font-medium">更多</button>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <div class="rounded-2xl border border-amber-100 bg-gradient-to-b from-amber-50 to-white p-3 shadow-sm">
-                <p class="text-xs font-semibold text-amber-800">医疗权益卡A</p>
-                <p class="text-[10px] text-slate-500 mt-0.5 line-clamp-2">无忧购药XXX</p>
-                <p class="text-sm font-bold text-red-600 mt-2">购药折扣8折</p>
-                <p class="text-xs text-slate-600">888元/一年</p>
-                <button type="button" @click="openDetail('equity-a')" class="mt-2 w-full py-2 rounded-xl bg-amber-500 text-white text-xs font-semibold">立即查看</button>
-              </div>
-              <div class="rounded-2xl border border-violet-100 bg-gradient-to-b from-violet-50 to-white p-3 shadow-sm">
-                <p class="text-xs font-semibold text-violet-800">医疗权益卡B</p>
-                <p class="text-[10px] text-slate-500 mt-0.5 line-clamp-2">钻石购药卡XXX</p>
-                <p class="text-sm font-bold text-red-600 mt-2">购药折扣6折</p>
-                <p class="text-xs text-slate-600">999元/一年</p>
-                <button type="button" @click="openDetail('equity-b')" class="mt-2 w-full py-2 rounded-xl bg-violet-600 text-white text-xs font-semibold">立即查看</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- 感冒用药榜单 -->
-          <div class="px-3 mt-6">
-            <div class="flex items-center justify-between mb-3">
-              <h2 class="text-base font-bold text-slate-900">感冒用药榜单</h2>
-              <button type="button" @click="toast('更多感冒用药')" class="text-sm text-brand-600 font-medium">更多</button>
-            </div>
-            <div class="grid grid-cols-3 gap-2">
-              <template x-for="d in drugsCold" :key="d.id">
-                <div class="rounded-xl border border-slate-100 bg-white overflow-hidden shadow-sm flex flex-col">
-                  <button type="button" @click="openDrug(d)" class="aspect-square bg-slate-100 overflow-hidden">
-                    <img :src="d.thumb" alt="" class="w-full h-full object-cover" />
-                  </button>
-                  <div class="p-2 flex-1 flex flex-col">
-                    <p class="text-[10px] text-slate-700 line-clamp-2 leading-tight min-h-[2rem]" x-text="d.name"></p>
-                    <p class="text-red-600 font-bold text-xs mt-1">
-                      ¥<span x-text="drugUnitPrice(d).toFixed(2)"></span>
-                      <span class="text-[9px] font-normal border border-red-200 rounded px-0.5"
-                            :class="drugCardActivated ? 'text-red-500' : 'text-slate-500'">
-                        <span x-show="drugCardActivated">8折价</span>
-                        <span x-show="!drugCardActivated">原价</span>
-                      </span>
-                    </p>
-                    <p class="text-[9px] text-slate-500" x-show="drugCardActivated">
-                      已优惠¥<span x-text="drugSavings(d).toFixed(2)"></span>
-                    </p>
-                    <div class="mt-2 grid grid-cols-2 gap-1">
-                      <button type="button" @click="openDrug(d)" class="py-1.5 rounded-lg border border-slate-200 text-slate-700 text-[10px] font-medium">详情</button>
-                      <button type="button"
-                              @click.stop="if(!loggedIn){view='login'; return;} addToCart(d)"
-                              class="py-1.5 rounded-lg bg-brand-500 text-white text-[10px] font-medium">
-                        <span x-show="!loggedIn">去登录</span>
-                        <span x-show="loggedIn">加购</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </template>
-            </div>
-          </div>
-
-          <!-- 儿童用药榜单 -->
-          <div class="px-3 mt-6">
-            <div class="flex items-center justify-between mb-3">
-              <h2 class="text-base font-bold text-slate-900">儿童用药榜单</h2>
-              <button type="button" @click="toast('更多儿童用药')" class="text-sm text-brand-600 font-medium">更多</button>
-            </div>
-            <div class="grid grid-cols-3 gap-2">
-              <template x-for="d in drugsChild" :key="d.id">
-                <div class="rounded-xl border border-slate-100 bg-white overflow-hidden shadow-sm flex flex-col">
-                  <button type="button" @click="openDrug(d)" class="aspect-square bg-slate-100 overflow-hidden">
-                    <img :src="d.thumb" alt="" class="w-full h-full object-cover" />
-                  </button>
-                  <div class="p-2 flex-1 flex flex-col">
-                    <p class="text-[10px] text-slate-700 line-clamp-2 leading-tight min-h-[2rem]" x-text="d.name"></p>
-                    <p class="text-red-600 font-bold text-xs mt-1">
-                      ¥<span x-text="drugUnitPrice(d).toFixed(2)"></span>
-                      <span class="text-[9px] font-normal border border-red-200 rounded px-0.5"
-                            :class="drugCardActivated ? 'text-red-500' : 'text-slate-500'">
-                        <span x-show="drugCardActivated">8折价</span>
-                        <span x-show="!drugCardActivated">原价</span>
-                      </span>
-                    </p>
-                    <p class="text-[9px] text-slate-500" x-show="drugCardActivated">
-                      已优惠¥<span x-text="drugSavings(d).toFixed(2)"></span>
-                    </p>
-                    <div class="mt-2 grid grid-cols-2 gap-1">
-                      <button type="button" @click="openDrug(d)" class="py-1.5 rounded-lg border border-slate-200 text-slate-700 text-[10px] font-medium">详情</button>
-                      <button type="button"
-                              @click.stop="if(!loggedIn){view='login'; return;} addToCart(d)"
-                              class="py-1.5 rounded-lg bg-brand-500 text-white text-[10px] font-medium">
-                        <span x-show="!loggedIn">去登录</span>
-                        <span x-show="loggedIn">加购</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </template>
-            </div>
-          </div>
-
-          <!-- 药品组合包列表 -->
-          <div class="px-3 mt-6 mb-4">
-            <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4 shadow-inner">
-            <h2 class="text-lg font-bold text-gray-800 mb-4">药品组合包</h2>
-            <div class="space-y-3">
-              <template x-for="pack in comboPacks" :key="pack.id">
-                <div class="bg-white rounded-xl border border-gray-100 p-4 flex justify-between items-center shadow-sm">
-                  <div class="flex-1 min-w-0 pr-3">
-                    <p class="font-bold text-gray-900 text-sm" x-text="pack.title"></p>
-                    <p class="text-sm text-gray-500 mt-1 leading-snug" x-text="pack.desc"></p>
-                  </div>
-                  <button type="button" @click="openCombo(pack)" class="shrink-0 bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium active:opacity-90">查看</button>
-                </div>
-              </template>
-            </div>
-            </div>
-          </div>
+          <!-- 首页榜单区已按需求移除：感冒用药榜单、儿童用药榜单 -->
 
           <!-- 底部证照 -->
           <footer class="px-4 py-6 text-center text-[10px] text-slate-400 border-t border-slate-100 bg-slate-50">
@@ -782,39 +1288,89 @@
         </div>
 
         <!-- 购物车 -->
-        <div x-show="tab === 'cart'" class="pb-32">
-          <header class="sticky top-0 z-10 bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between">
-            <h1 class="font-bold text-lg">购物车</h1>
-            <span class="text-xs text-slate-400" x-show="cartStep === 1">共 <span x-text="cartItems.length"></span> 件</span>
+        <div x-show="tab === 'cart'" class="pb-40">
+          <header class="sticky top-0 z-10 bg-[#6B5BC8] text-white px-3 py-3 flex items-center justify-between">
+            <span class="w-8"></span>
+            <h1 class="font-semibold text-base">购物车</h1>
+            <span class="text-xs text-white/90 w-8 text-right" x-show="cartStep === 1" @click="toast('编辑（演示）')">编辑</span>
           </header>
+          <div x-show="cartStep === 1" class="bg-orange-50 border-b border-orange-100 px-3 py-2 flex items-start gap-2 text-[10px] text-orange-900 leading-snug">
+            <i class="ri-information-fill text-orange-500 shrink-0 mt-0.5"></i>
+            <span>《药品网络销售监督管理办法》规定，处方药须凭处方，在药师指导下购买和使用。</span>
+          </div>
 
           <!-- Step 1 -->
-          <div x-show="cartStep === 1" class="px-3 pt-3 space-y-3">
+          <div x-show="cartStep === 1" class="px-3 pt-3 space-y-3 bg-[#f4f4f5] min-h-[40vh]">
             <template x-if="cartItems.length === 0">
-              <div class="text-center py-16 text-slate-400 text-sm">购物车是空的<br/>去首页逛逛吧</div>
+              <div class="text-center py-16 text-slate-400 text-sm bg-white rounded-xl">购物车是空的<br/>去首页逛逛吧</div>
             </template>
             <template x-for="item in cartItems" :key="item.id">
-              <div class="flex gap-3 bg-white rounded-2xl border border-slate-100 p-3 shadow-sm">
-                <input type="checkbox" x-model="item.checked" class="mt-5 rounded border-slate-300 text-brand-600 focus:ring-brand-500" />
-                <div class="w-16 h-16 rounded-xl bg-slate-100 flex items-center justify-center text-2xl shrink-0 text-slate-400"><i class="ri-image-line"></i></div>
+              <div class="flex gap-2 bg-white rounded-xl border border-slate-100 p-3 shadow-sm">
+                <input type="checkbox" x-model="item.checked" class="mt-8 rounded-full border-slate-300 text-orange-500 focus:ring-orange-400 w-5 h-5 shrink-0" />
+                <div class="relative w-20 h-20 rounded-lg bg-slate-100 shrink-0 overflow-hidden flex items-center justify-center">
+                  <template x-if="item.thumb">
+                    <img :src="item.thumb" alt="" class="w-full h-full object-cover" />
+                  </template>
+                  <template x-if="!item.thumb">
+                    <i class="ri-image-line text-2xl text-slate-400"></i>
+                  </template>
+                  <div x-show="item.type === 'drug' && (item.drugKind || 'otc') === 'rx'" class="absolute inset-0 bg-black/45 flex items-center justify-center px-1 pointer-events-none">
+                    <p class="text-[7px] text-white text-center leading-tight font-medium">处方药 请凭处方在药师指导下购买和使用</p>
+                  </div>
+                </div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium line-clamp-2" x-text="item.name"></p>
-                  <p class="text-red-600 font-bold text-sm mt-1">¥<span x-text="cartItemUnitPrice(item).toFixed(2)"></span></p>
+                  <p class="text-[10px] mb-1" x-show="item.type === 'drug'">
+                    <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold" :class="(item.drugKind || 'otc') === 'rx' ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'" x-text="(item.drugKind || 'otc') === 'rx' ? '处方药' : '非处方药'"></span>
+                  </p>
+                  <p class="text-xs font-semibold text-slate-900 line-clamp-2 leading-snug" x-text="item.name"></p>
+                  <div class="mt-1.5">
+                    <template x-if="item.type === 'drug'">
+                      <template x-if="drugShowEquity">
+                        <div>
+                          <p class="text-sm font-bold text-red-600 leading-snug">
+                            ¥<span x-text="cartItemUnitPrice(item).toFixed(2)"></span> 到手价｜
+                            <span class="text-[11px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded ml-1">
+                              已补贴¥<span x-text="cartItemUnitSubsidy(item).toFixed(2)"></span>
+                            </span>
+                          </p>
+                          <p class="text-[10px] text-slate-400 mt-0.5">原价¥<span x-text="cartItemOriginalUnit(item).toFixed(2)"></span></p>
+                        </div>
+                      </template>
+                      <template x-if="!drugShowEquity">
+                        <div>
+                          <p class="text-sm font-bold text-red-600 leading-snug">
+                            ¥<span x-text="cartItemOriginalUnit(item).toFixed(2)"></span> 原价
+                          </p>
+                          <p class="text-[10px] text-red-500 mt-0.5">¥? <span class="ml-0.5">权益价</span></p>
+                        </div>
+                      </template>
+                    </template>
+                    <template x-if="item.type !== 'drug'">
+                      <p class="text-sm font-bold text-red-600">¥<span x-text="(item.subtotal ?? 0).toFixed(2)"></span></p>
+                    </template>
+                  </div>
                   <div class="flex items-center justify-between mt-2">
-                    <div class="flex items-center border border-slate-200 rounded-lg overflow-hidden">
-                      <button type="button" @click="item.qty = Math.max(1, item.qty - 1)" class="px-2 py-1 text-slate-600">−</button>
-                      <span class="px-3 text-sm w-10 text-center" x-text="item.qty"></span>
-                      <button type="button" @click="item.qty++" class="px-2 py-1 text-slate-600">+</button>
+                    <div class="flex items-center border border-slate-200 rounded-full overflow-hidden text-sm">
+                      <button type="button" @click="item.qty = Math.max(1, item.qty - 1)" class="px-2.5 py-1 text-slate-600 bg-slate-50">−</button>
+                      <span class="px-3 w-9 text-center font-medium" x-text="item.qty"></span>
+                      <button type="button" @click="item.qty++" class="px-2.5 py-1 text-slate-600 bg-slate-50">+</button>
                     </div>
-                    <button type="button" @click="removeCart(item.id)" class="text-xs text-red-500">删除</button>
+                    <button type="button" @click="removeCart(item.id)" class="text-xs text-slate-400">删除</button>
                   </div>
                 </div>
               </div>
             </template>
+            <div x-show="cartItems.length > 0" class="rounded-xl bg-white border border-orange-100 p-3 text-xs text-orange-800">
+              <p class="font-semibold flex items-center gap-1 text-orange-600"><i class="ri-heart-3-fill"></i> 您可能还需要</p>
+              <p class="text-[10px] text-slate-500 mt-1">更多补贴好物（演示占位）</p>
+            </div>
           </div>
 
           <!-- Step 2 -->
           <div x-show="cartStep === 2" class="px-3 pt-3 space-y-3 text-sm">
+            <div x-show="rxPrescriptionComplete && selectedHasRx" class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs text-emerald-800">
+              问诊已完成 · 电子处方已开具（演示），可继续填写收货信息并支付。
+            </div>
             <div class="bg-white rounded-2xl border border-slate-100 p-4 space-y-2">
               <p class="font-semibold">收货人</p>
               <input type="text" x-model="order.receiver" placeholder="姓名" class="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-brand-500" />
@@ -864,37 +1420,36 @@
           <div x-show="cartStep === 3" class="px-3 pt-3 space-y-3">
             <p class="text-sm text-slate-500 px-1">确认订单并选择支付方式</p>
             <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-              <label class="flex items-center gap-3 p-4 border-b border-slate-50 cursor-pointer">
+              <label class="flex items-center gap-3 p-4 cursor-pointer">
                 <input type="radio" name="pay" value="wx" x-model="payMethod" class="text-brand-600" />
                 <span>微信支付</span>
-              </label>
-              <label class="flex items-center gap-3 p-4 cursor-pointer">
-                <input type="radio" name="pay" value="ali" x-model="payMethod" class="text-brand-600" />
-                <span>支付宝</span>
               </label>
             </div>
             <div class="bg-slate-50 rounded-2xl p-4 text-sm">
               <p>应付金额：<span class="text-red-600 font-bold text-lg">¥<span x-text="payAmount.toFixed(2)"></span></span></p>
             </div>
-            <button type="button" @click="completePay()" class="w-full py-3.5 rounded-2xl bg-brand-600 text-white font-semibold">完成支付（演示）</button>
           </div>
 
           <!-- 购物车底部栏 -->
-          <div x-show="tab === 'cart'" class="fixed bottom-16 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 px-3 py-3 safe-pb shadow-[0_-4px_20px_rgba(0,0,0,0.06)] z-30">
+          <div x-show="tab === 'cart'" class="fixed bottom-14 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 px-3 py-3 safe-pb shadow-[0_-4px_20px_rgba(0,0,0,0.06)] z-[61]">
             <div x-show="cartStep === 1" class="flex items-center gap-3">
-              <label class="flex items-center gap-2 text-sm shrink-0">
-                <input type="checkbox" :checked="allChecked" @change="toggleAll($event.target.checked)" class="rounded border-slate-300 text-brand-600" />
+              <label class="flex items-center gap-2 text-sm shrink-0 text-slate-700">
+                <input type="checkbox" :checked="allChecked" @change="toggleAll($event.target.checked)" class="rounded-full border-slate-300 text-orange-500 w-5 h-5" />
                 全选
               </label>
-              <div class="flex-1 text-right text-xs">
-                <p>合计 <span class="text-red-600 font-bold text-base">¥<span x-text="selectedTotal.toFixed(2)"></span></span></p>
-                <p class="text-emerald-600">共减¥<span x-text="selectedSubsidy.toFixed(2)"></span></p>
+              <div class="flex-1 text-right text-xs min-w-0">
+                <p class="text-slate-600">合计：<span class="text-red-600 font-bold text-lg">¥<span x-text="selectedTotal.toFixed(2)"></span></span></p>
+                <p class="text-orange-500 mt-0.5">共减 ¥<span x-text="selectedSubsidy.toFixed(2)"></span> <span class="text-slate-400">查看明细 ^</span></p>
               </div>
-              <button type="button" @click="goCartStep2()" :disabled="selectedCount === 0" class="shrink-0 px-5 py-2.5 rounded-xl bg-brand-600 text-white text-sm font-semibold disabled:opacity-40">下一步</button>
+              <button type="button" @click="goCartStep2()" :disabled="selectedCount === 0" class="shrink-0 px-6 py-2.5 rounded-full bg-gradient-to-r from-orange-500 to-orange-400 text-white text-sm font-bold shadow-md disabled:opacity-40">下一步</button>
             </div>
             <div x-show="cartStep === 2" class="flex items-center justify-between gap-3">
               <p class="text-xs text-slate-600">共 <span x-text="selectedCount"></span> 件，合计：<span class="text-red-600 font-bold">¥<span x-text="selectedTotal.toFixed(2)"></span></span></p>
               <button type="button" @click="cartStep = 3" class="px-5 py-2.5 rounded-xl bg-brand-600 text-white text-sm font-semibold">下一步</button>
+            </div>
+            <div x-show="cartStep === 3" class="flex items-center justify-between gap-3">
+              <p class="text-xs text-slate-600">待支付金额：<span class="text-red-600 font-bold text-base">¥<span x-text="payAmount.toFixed(2)"></span></span></p>
+              <button type="button" @click="completePay()" class="px-6 py-2.5 rounded-xl bg-brand-600 text-white text-sm font-semibold">去支付</button>
             </div>
           </div>
         </div>
@@ -907,9 +1462,9 @@
                 <div class="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center text-2xl"><i class="ri-user-smile-line"></i></div>
                 <div>
                   <p class="font-semibold" x-text="loggedIn ? (userMask || '用户') : '未登录'"></p>
-                  <p class="text-xs opacity-90" x-show="loggedIn && drugCardActivated">药诊卡已激活 · 享 8 折</p>
+                  <p class="text-xs opacity-90" x-show="loggedIn && drugCardActivated">药诊卡已激活 · 享 7 折权益价</p>
                   <p class="text-xs opacity-90" x-show="loggedIn && !drugCardActivated">药诊卡未激活 · 按原价购买</p>
-                  <p class="text-xs opacity-90" x-show="!loggedIn">待激活：登录并激活药诊卡享 8 折</p>
+                  <p class="text-xs opacity-90" x-show="!loggedIn">待激活：登录并激活药诊卡享权益价</p>
                   <button type="button" x-show="!loggedIn" @click="view = 'login'" class="mt-1 text-xs bg-white/20 px-2 py-1 rounded-lg">去登录</button>
                   <button type="button" x-show="loggedIn && !drugCardActivated" @click="view = 'cardActivate'; activatePhone = loginPhone" class="mt-1 text-xs bg-white/20 px-2 py-1 rounded-lg">去激活</button>
                 </div>
@@ -938,6 +1493,24 @@
           </div>
 
           <div class="px-3 -mt-6 space-y-3 relative z-10">
+            <!-- 我的权益（福利卡横向权益入口） -->
+            <div class="bg-gradient-to-b from-[#FFF1E5] to-white rounded-2xl border border-orange-100/90 p-4 shadow-sm">
+              <p class="text-sm font-bold text-slate-900 mb-3">我的权益</p>
+              <div class="flex gap-5 overflow-x-auto pb-1 -mx-0.5 px-0.5">
+                <template x-for="(b, bi) in myBenefits" :key="'ben-' + bi">
+                  <div class="shrink-0 w-[4.75rem] text-center">
+                    <div class="w-12 h-12 mx-auto rounded-full bg-gradient-to-b from-slate-700 to-slate-900 flex items-center justify-center text-amber-100 text-lg shadow-md mb-2">
+                      <i :class="b.icon"></i>
+                    </div>
+                    <p class="text-xs font-bold text-slate-900 leading-tight" x-text="b.title"></p>
+                    <p class="text-[10px] text-slate-500 mt-0.5 leading-tight" x-text="b.sub"></p>
+                  </div>
+                </template>
+              </div>
+              <div class="h-1 rounded-full bg-slate-200/90 mt-3 mx-10 overflow-hidden">
+                <div class="h-full w-1/4 rounded-full bg-orange-400"></div>
+              </div>
+            </div>
             <!-- 药诊福利卡 -->
             <div class="bg-white rounded-2xl border border-orange-100 shadow-sm overflow-hidden">
               <div class="p-4 bg-gradient-to-r from-orange-500 to-red-500 text-white flex items-start justify-between gap-3">
@@ -953,7 +1526,7 @@
                 </div>
                 <div class="text-right">
                   <p class="text-xs font-semibold text-white/90">0 张可用优惠券</p>
-                  <p class="text-[10px] mt-1 text-white/80" x-show="drugCardActivated">已激活享 8 折</p>
+                  <p class="text-[10px] mt-1 text-white/80" x-show="drugCardActivated">已激活享 7 折</p>
                   <p class="text-[10px] mt-1 text-white/80" x-show="!drugCardActivated && loggedIn">未激活 · 按原价</p>
                   <p class="text-[10px] mt-1 text-white/80" x-show="!loggedIn">未登录 · 先登录</p>
                 </div>
@@ -1048,18 +1621,18 @@
 
     <!-- 权益卡详情 -->
     <template x-if="detailPage === 'equity' && detailEquity">
-      <div class="fixed inset-0 z-40 bg-white max-w-md mx-auto left-0 right-0 flex flex-col overflow-hidden">
+      <div class="fixed inset-0 z-[59] bg-white max-w-md mx-auto left-0 right-0 flex flex-col overflow-hidden">
         <header class="flex items-center gap-3 px-3 py-3 border-b border-slate-100 shrink-0">
           <button type="button" @click="closeDetail()" class="p-2 -ml-2 rounded-xl">←</button>
           <h1 class="font-semibold flex-1 truncate" x-text="detailEquity.title"></h1>
           <button type="button"
-                  @click="tab = 'cart'; cartStep = 1; closeDetail()"
+                  @click="bottomNavCart()"
                   class="p-2 rounded-xl bg-slate-50 text-slate-600"
                   aria-label="购物车">
             <i class="ri-shopping-cart-2-line"></i>
           </button>
         </header>
-        <div class="flex-1 overflow-y-auto pb-28">
+        <div class="flex-1 overflow-y-auto pb-44">
           <div class="h-40 bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold" x-text="detailEquity.bannerText"></div>
           <div class="p-4 space-y-4 text-sm">
             <h2 class="text-lg font-bold" x-text="detailEquity.title"></h2>
@@ -1091,7 +1664,7 @@
             <div class="rounded-2xl bg-slate-100 h-32 flex items-center justify-center text-slate-400 text-xs">产品详情图示意</div>
           </div>
         </div>
-        <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 px-3 py-3 safe-pb flex items-center gap-3 z-50">
+        <div class="fixed bottom-14 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 px-3 py-3 safe-pb flex items-center gap-3 z-[61]">
           <div class="text-xs text-slate-500 shrink-0">
             <p>已售 <span class="font-semibold text-slate-800" x-text="detailEquity.sold"></span></p>
             <p>剩余 <span class="font-semibold text-red-600" x-text="detailEquity.left"></span></p>
@@ -1104,85 +1677,183 @@
       </div>
     </template>
 
-    <!-- 药品详情 -->
+    <!-- 药品详情（处方药 / 非处方药 参考稿） -->
     <template x-if="detailPage === 'drug' && detailDrug">
-      <div class="fixed inset-0 z-40 bg-white max-w-md mx-auto left-0 right-0 flex flex-col overflow-hidden">
-        <header class="flex items-center gap-3 px-3 py-3 border-b border-slate-100 shrink-0">
-          <button type="button" @click="closeDetail()" class="p-2 -ml-2 rounded-xl">←</button>
-          <h1 class="font-semibold flex-1 truncate text-sm" x-text="detailDrug.name"></h1>
+      <div class="fixed inset-0 z-[59] bg-[#f4f4f5] max-w-md mx-auto left-0 right-0 flex flex-col overflow-hidden">
+        <header class="flex items-center gap-3 px-3 py-3 bg-[#6B5BC8] text-white shrink-0">
+          <button type="button" @click="closeDetail()" class="p-2 -ml-2 rounded-xl text-white/95 text-lg" aria-label="返回"><i class="ri-arrow-left-s-line"></i></button>
+          <h1 class="font-semibold flex-1 text-center text-sm truncate pr-2">商品详情</h1>
           <button type="button"
-                  @click="tab = 'cart'; cartStep = 1; closeDetail()"
-                  class="p-2 rounded-xl bg-slate-50 text-slate-600"
-                  aria-label="购物车">
-            <i class="ri-shopping-cart-2-line"></i>
+                  @click="bottomNavHome()"
+                  class="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center text-white/95"
+                  aria-label="返回首页">
+            <i class="ri-home-4-line text-lg"></i>
           </button>
         </header>
-        <div class="flex-1 overflow-y-auto pb-28">
-          <div class="aspect-square bg-slate-100 overflow-hidden">
-            <img :src="detailDrug.thumb" alt="" class="w-full h-full object-cover" />
+        <div class="flex-1 overflow-y-auto pb-[7.5rem]">
+          <div class="relative aspect-square bg-white overflow-hidden">
+            <img :src="detailDrug.thumb" alt="" class="w-full h-full object-contain" />
+            <div x-show="(detailDrug.drugKind || 'otc') === 'rx'" class="absolute inset-0 bg-black/35 flex items-center justify-center px-6 pointer-events-none">
+              <p class="text-white text-sm font-semibold text-center leading-relaxed">处方药 请凭处方在药师指导下购买和使用</p>
+            </div>
+            <div class="absolute top-2 right-2 flex flex-col gap-2 pointer-events-none">
+              <span class="w-9 h-9 rounded-full bg-black/25 text-white flex items-center justify-center text-sm backdrop-blur-sm"><i class="ri-home-4-line"></i></span>
+              <span x-show="(detailDrug.drugKind || 'otc') === 'rx'" class="text-[10px] font-bold text-white bg-red-600/90 px-2 py-1 rounded-md">RX</span>
+            </div>
           </div>
-          <div class="p-4 space-y-3 text-sm">
+          <!-- 药品价格（图片下方） -->
+          <div class="mt-2 px-4 py-3 rounded-xl border shadow-sm"
+               :class="drugShowEquity ? 'border-amber-200 bg-amber-50/60' : 'border-slate-200 bg-white'">
+            <template x-if="drugShowEquity">
+              <div>
+                <p class="text-lg font-black text-red-600 leading-snug">
+                  ¥<span x-text="drugEquityPrice(detailDrug).toFixed(2)"></span> 到手价｜
+                  <span class="text-[12px] font-semibold text-red-600 border border-red-100 bg-red-50 px-2 py-0.5 rounded ml-1">
+                    已补贴¥<span x-text="drugSavedAmount(detailDrug).toFixed(2)"></span>
+                  </span>
+                </p>
+                <p class="text-[10px] text-slate-400 mt-0.5">原价¥<span x-text="drugOriginalPrice(detailDrug).toFixed(2)"></span></p>
+              </div>
+            </template>
+            <template x-if="!drugShowEquity">
+              <div>
+                <p class="text-lg font-black text-red-600 leading-snug">
+                  ¥<span x-text="drugOriginalPrice(detailDrug).toFixed(2)"></span> 原价
+                </p>
+                <p class="text-[10px] text-red-500 mt-0.5">¥? <span class="ml-0.5">权益价</span></p>
+              </div>
+            </template>
+          </div>
+          <div class="bg-white px-3 py-3 space-y-3 text-sm border-b border-slate-100">
             <p class="text-xs text-slate-400">药品说明书（示意）</p>
-            <div class="flex items-end gap-2">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-xs font-semibold" :class="(detailDrug.drugKind || 'otc') === 'rx' ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'" x-text="(detailDrug.drugKind || 'otc') === 'rx' ? '处方药' : '非处方药'"></span>
+              <template x-if="(detailDrug.drugKind || 'otc') !== 'rx'">
+                <span class="text-xs text-slate-500 border border-slate-200 rounded px-2 py-0.5">OTC</span>
+              </template>
+            </div>
+            <h2 class="text-base font-bold text-slate-900 leading-snug" x-text="detailDrug.name"></h2>
+            <template x-if="detailDrug.effectTags && detailDrug.effectTags.length">
+              <div class="flex flex-wrap gap-2">
+                <template x-for="tg in detailDrug.effectTags" :key="tg">
+                  <span class="text-xs text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full" x-text="tg"></span>
+                </template>
+              </div>
+            </template>
+            <p class="text-xs text-slate-400">已售 <span class="text-slate-600 font-medium" x-text="detailDrug.sold"></span></p>
+            <template x-if="detailDrug.rankBadge">
+              <div class="flex items-center justify-between rounded-lg bg-gradient-to-r from-amber-100 to-amber-50 border border-amber-200 px-3 py-2">
+                <span class="text-xs font-bold text-amber-900 flex items-center gap-1"><i class="ri-trophy-line"></i><span x-text="detailDrug.rankBadge"></span></span>
+                <i class="ri-arrow-right-s-line text-amber-700"></i>
+              </div>
+            </template>
+            <p x-show="(detailDrug.drugKind || 'otc') === 'rx'" class="text-xs text-red-600 leading-relaxed bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+              温馨提示：处方药凭处方在药师指导下购买和使用，非质量问题不支持退换。
+            </p>
+          </div>
+          <!-- 处方药购买流程 -->
+          <div x-show="(detailDrug.drugKind || 'otc') === 'rx'" class="bg-white mt-2 px-3 py-4 border-y border-slate-100">
+            <p class="text-sm font-bold text-slate-900 mb-3">处方药购买流程</p>
+            <div class="flex items-start justify-between text-[9px] text-slate-500 text-center gap-1">
               <div class="flex-1">
-                <p class="text-sm font-bold text-slate-900">
-                  <template x-if="drugCardActivated">
-                    <span>
-                      ¥<span x-text="drugUnitPrice(detailDrug).toFixed(2)"></span>
-                      <span class="text-[10px] font-semibold text-orange-600 bg-orange-50 border border-orange-100 px-1.5 py-0.5 rounded-md ml-1">权益价</span>
-                    </span>
-                  </template>
-                  <template x-if="!drugCardActivated">
-                    <span>¥<span x-text="detailDrug.price.toFixed(2)"></span></span>
-                  </template>
-                </p>
-                <p class="text-[10px] text-slate-500 mt-0.5" x-show="drugCardActivated">
-                  原价：<s class="text-slate-400">¥<span x-text="detailDrug.price.toFixed(2)"></span></s>
-                </p>
+                <div class="w-8 h-8 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-600 mb-1"><i class="ri-send-plane-line"></i></div>
+                <span>选药提交</span>
+              </div>
+              <span class="text-slate-300 pt-2">›</span>
+              <div class="flex-1">
+                <div class="w-8 h-8 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-600 mb-1"><i class="ri-file-list-3-line"></i></div>
+                <span>填地址下单</span>
+              </div>
+              <span class="text-slate-300 pt-2">›</span>
+              <div class="flex-1">
+                <div class="w-8 h-8 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-600 mb-1"><i class="ri-file-medical-line"></i></div>
+                <span>完善处方</span>
+              </div>
+              <span class="text-slate-300 pt-2">›</span>
+              <div class="flex-1">
+                <div class="w-8 h-8 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-600 mb-1"><i class="ri-user-heart-line"></i></div>
+                <span>药师审核</span>
+              </div>
+              <span class="text-slate-300 pt-2">›</span>
+              <div class="flex-1">
+                <div class="w-8 h-8 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-600 mb-1"><i class="ri-truck-line"></i></div>
+                <span>支付发货</span>
               </div>
             </div>
-            <h2 class="text-base font-bold leading-snug" x-text="detailDrug.name"></h2>
-            <div class="grid gap-2 text-slate-600">
-              <p><span class="text-slate-400">功效：</span><span x-text="detailDrug.effect"></span></p>
-              <p><span class="text-slate-400">用量：</span><span x-text="detailDrug.usage"></span></p>
-              <p><span class="text-slate-400">有效期：</span><span x-text="detailDrug.expiry"></span></p>
-              <p><span class="text-slate-400">禁忌：</span><span x-text="detailDrug.taboo"></span></p>
-              <p><span class="text-slate-400">运费：</span>快递 ¥0.00（包邮）</p>
+          </div>
+          <!-- 功效与参数网格（非处方药强化） -->
+          <div class="bg-white mt-2 px-3 py-4 space-y-3">
+            <p class="text-sm font-semibold text-slate-900">功效</p>
+            <p class="text-xs text-slate-600 leading-relaxed" x-text="detailDrug.effect"></p>
+            <div class="grid grid-cols-3 gap-0 rounded-xl border border-slate-200 overflow-hidden text-center text-[10px]">
+              <div class="border-r border-b border-slate-200 py-2 px-1 bg-slate-50 text-slate-500">用法用量</div>
+              <div class="border-r border-b border-slate-200 py-2 px-1 bg-slate-50 text-slate-500">有效期</div>
+              <div class="border-b border-slate-200 py-2 px-1 bg-slate-50 text-slate-500">禁忌</div>
+              <div class="border-r border-slate-200 py-2 px-1 text-slate-700 leading-tight" x-text="detailDrug.usage"></div>
+              <div class="border-r border-slate-200 py-2 px-1 text-slate-700" x-text="detailDrug.expiry"></div>
+              <div class="py-2 px-1 text-slate-700 leading-tight line-clamp-3" x-text="detailDrug.taboo"></div>
             </div>
-            <div class="rounded-xl bg-slate-50 p-3 text-xs text-slate-600">
-              <p class="font-semibold text-slate-800 mb-2">产品参数</p>
-              <p>批准文号：国药准字XXXXXXXX</p>
-              <p>规格：<span x-text="detailDrug.spec"></span></p>
-              <p>生产企业：示例制药有限公司</p>
+            <button type="button" class="w-full flex items-center justify-between text-xs text-slate-500 py-2 border-t border-slate-100">
+              <span>产品参数</span>
+              <i class="ri-arrow-right-s-line"></i>
+            </button>
+          </div>
+          <template x-if="detailDrug.deliverCity">
+            <div class="bg-white mt-2 px-3 py-3 text-xs space-y-2 border-t border-slate-100">
+              <div class="flex justify-between items-center">
+                <span class="text-slate-500">送至</span>
+                <span class="text-slate-800 flex items-center gap-1" x-text="detailDrug.deliverCity"></span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-500">运费</span>
+                <span>快递：¥0.00（包邮）</span>
+              </div>
+              <p class="text-[10px] text-slate-400">17点前订单当天发货，17点后次日17点前发货（演示）</p>
+              <div class="flex flex-wrap gap-3 pt-2 text-[10px] text-slate-600">
+                <span class="flex items-center gap-0.5"><i class="ri-checkbox-circle-fill text-red-500"></i>品牌授权</span>
+                <span class="flex items-center gap-0.5"><i class="ri-checkbox-circle-fill text-red-500"></i>资质齐全</span>
+                <span class="flex items-center gap-0.5"><i class="ri-checkbox-circle-fill text-red-500"></i>无忧售后</span>
+                <span class="flex items-center gap-0.5"><i class="ri-checkbox-circle-fill text-red-500"></i>隐私包装</span>
+              </div>
             </div>
-            <div class="rounded-xl border border-slate-100 p-3">
-              <p class="font-semibold mb-2">投医生问答</p>
-              <p class="text-xs text-slate-500">用药疑问可咨询药师或互联网医院医生（演示文案）。</p>
-            </div>
+          </template>
+          <div class="bg-white mt-2 px-3 py-4 mb-4 text-xs text-slate-500">
+            <p class="font-semibold text-slate-800 mb-1">投医生问答</p>
+            <p>用药疑问可咨询药师或互联网医院医生（演示）。</p>
           </div>
         </div>
-        <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 px-3 py-3 safe-pb flex items-center gap-3 z-50">
-          <div class="text-xs text-slate-500 shrink-0">已售 <span class="font-semibold" x-text="detailDrug.sold"></span></div>
-          <button type="button" @click="showService = true" class="px-3 py-2 rounded-xl border border-slate-200 text-sm">客服</button>
-          <button type="button" @click="addToCart(detailDrug)" class="flex-1 py-3 rounded-2xl bg-brand-600 text-white text-sm font-semibold">加入购物车</button>
+        <!-- 底栏：四入口 + 双按钮 -->
+        <div class="fixed bottom-14 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 safe-pb z-[61] shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+          <div class="flex items-stretch px-2 pt-2 pb-2 gap-2">
+            <div class="flex shrink-0 gap-3 pl-1 pr-1">
+              <button type="button" @click="showService = true" class="flex flex-col items-center justify-center w-11 text-[9px] text-slate-600">
+                <i class="ri-customer-service-2-line text-lg text-sky-500"></i>客服
+              </button>
+            </div>
+            <div class="flex-1 flex gap-2 min-w-0">
+              <button type="button" @click="addToCart(detailDrug)" class="flex-1 py-2.5 rounded-full bg-amber-400 text-white text-xs font-bold shadow-sm">加入购物车</button>
+              <button type="button" x-show="(detailDrug.drugKind || 'otc') === 'rx'" @click="buyRxFromDetail()" class="flex-1 py-2.5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold shadow-sm">开方购买</button>
+              <button type="button" x-show="(detailDrug.drugKind || 'otc') !== 'rx'" @click="buyNowFromDetail()" class="flex-1 py-2.5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold shadow-sm">立即购买</button>
+            </div>
+          </div>
         </div>
       </div>
     </template>
 
     <!-- 组合包详情 -->
     <template x-if="detailPage === 'combo' && detailCombo">
-      <div class="fixed inset-0 z-40 bg-white max-w-md mx-auto left-0 right-0 flex flex-col overflow-hidden">
+      <div class="fixed inset-0 z-[59] bg-white max-w-md mx-auto left-0 right-0 flex flex-col overflow-hidden">
         <header class="flex items-center gap-3 px-3 py-3 border-b border-slate-100 shrink-0">
           <button type="button" @click="closeDetail()" class="p-2 -ml-2 rounded-xl">←</button>
           <h1 class="font-semibold flex-1 truncate text-sm" x-text="detailCombo.title"></h1>
           <button type="button"
-                  @click="tab = 'cart'; cartStep = 1; closeDetail()"
+                  @click="bottomNavCart()"
                   class="p-2 rounded-xl bg-slate-50 text-slate-600"
                   aria-label="购物车">
             <i class="ri-shopping-cart-2-line"></i>
           </button>
         </header>
-        <div class="flex-1 overflow-y-auto pb-28 p-4 space-y-4 text-sm">
+        <div class="flex-1 overflow-y-auto pb-44 p-4 space-y-4 text-sm">
           <div class="rounded-2xl h-36 bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-4xl text-slate-400"><i class="ri-image-line"></i></div>
           <p class="text-slate-600" x-text="detailCombo.detail"></p>
           <div class="rounded-xl bg-slate-50 p-3 text-xs text-slate-600 space-y-1">
@@ -1193,7 +1864,7 @@
           </div>
           <p class="text-red-600 font-bold">组合价：¥<span x-text="detailCombo.price"></span></p>
         </div>
-        <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 px-3 py-3 safe-pb flex gap-3 z-50">
+        <div class="fixed bottom-14 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 px-3 py-3 safe-pb flex gap-3 z-[61]">
           <button type="button" @click="showService = true" class="px-3 py-2 rounded-xl border border-slate-200 text-sm">客服</button>
           <button type="button" @click="addComboToCart()" class="flex-1 py-3 rounded-2xl bg-indigo-600 text-white text-sm font-semibold">加入购物车</button>
         </div>
@@ -1210,17 +1881,17 @@
       </div>
     </div>
 
-    <!-- 底部主导航 -->
-    <nav x-show="showBottomNav" class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 flex justify-around py-2 safe-pb z-40 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
-      <button type="button" @click="tab = 'home'; cartStep = 1" class="flex flex-col items-center gap-0.5 w-20 py-1 rounded-xl transition" :class="tab === 'home' ? 'text-brand-600' : 'text-slate-400'">
+    <!-- 底部主导航（除登录页外全局展示，盖在二级/三级页之上） -->
+    <nav x-show="showBottomNav" class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 flex justify-around py-2 safe-pb z-[62] shadow-[0_-2px_12px_rgba(0,0,0,0.08)]">
+      <button type="button" @click="bottomNavHome()" class="flex flex-col items-center gap-0.5 w-20 py-1 rounded-xl transition" :class="navHomeActive ? 'text-brand-600' : 'text-slate-400'">
         <span class="text-xl"><i class="ri-home-5-line"></i></span>
         <span class="text-[10px]">首页</span>
       </button>
-      <button type="button" @click="tab = 'cart'; cartStep = 1" class="flex flex-col items-center gap-0.5 w-20 py-1 rounded-xl transition" :class="tab === 'cart' ? 'text-brand-600' : 'text-slate-400'">
+      <button type="button" @click="bottomNavCart()" class="flex flex-col items-center gap-0.5 w-20 py-1 rounded-xl transition" :class="navCartActive ? 'text-brand-600' : 'text-slate-400'">
         <span class="text-xl"><i class="ri-shopping-cart-2-line"></i></span>
         <span class="text-[10px]">购物车</span>
       </button>
-      <button type="button" @click="tab = 'profile'" class="flex flex-col items-center gap-0.5 w-20 py-1 rounded-xl transition" :class="tab === 'profile' ? 'text-brand-600' : 'text-slate-400'">
+      <button type="button" @click="bottomNavProfile()" class="flex flex-col items-center gap-0.5 w-20 py-1 rounded-xl transition" :class="navProfileActive ? 'text-brand-600' : 'text-slate-400'">
         <span class="text-xl"><i class="ri-user-3-line"></i></span>
         <span class="text-[10px]">个人中心</span>
       </button>
@@ -1270,10 +1941,58 @@
         pendingOrdersStatus: '',
         pendingAddToCartDrug: null,
         cartStep: 1,
+        /** 权益卡购药折扣（演示：7折） */
+        equityDiscount: 0.7,
+        rxCheckoutStep: 1,
+        rxPrescriptionComplete: false,
+        rxCheckoutReturnView: 'confirmOrder',
+        showCartPriceDetail: false,
+        remoteConsultStep: 1,
+        orderDetailBackTo: 'ordersList',
+        showPayMethodSheet: false,
+        showRxPrescriptionDetail: false,
+        showCancelOrderModal: false,
+        showDeleteOrderConfirm: false,
+        cancelOrderReason: '我不想买了',
+        cancelRestoreCart: true,
+        cancelReasons: ['我不想买了', '信息填写错误，重新拍', '卖家缺货', '其它原因'],
+        rxSelectedPatientId: '',
+        rxPatients: [
+          { id: 'p1', name: '王嘉慧', age: 23, gender: '女', phone: '13958016230', phoneDisplay: '139****6230', idCard: '211223200211120849', health: '无过往病史、无过敏史、无肝功异常' }
+        ],
+        rxDiseaseByItemId: {},
+        rxDiseaseOptions: ['肛周脓肿', '细菌性肺炎', '急性上呼吸道感染', '支气管炎', '扁桃体炎', '皮肤软组织感染', '尿路感染', '急性胃肠炎'],
+        rxAgreementChecked: true,
+        rxUploadCount: 0,
+        rxAddPatientFrom: 'checkout',
+        rxNewName: '',
+        rxNewIdCard: '',
+        rxNewPhone: '',
+        rxNewHealth: '无过往病史、无过敏史、无肝功异常',
+        myBenefits: [
+          { icon: 'ri-capsule-line', title: '家庭药房', sub: '全场折扣' },
+          { icon: 'ri-stethoscope-line', title: '家庭医生', sub: '健康守护' },
+          { icon: 'ri-chat-smile-2-line', title: '问诊服务', sub: '7×24在线' },
+          { icon: 'ri-medicine-bottle-line', title: '特药服务', sub: '大病保障' },
+          { icon: 'ri-wheelchair-line', title: '器械服务', sub: '顶尖科技' }
+        ],
         payMethod: 'wx',
         activeCardIdx: 0,
-        equityCards: [],
-        drugCardActivated: false,
+        equityCards: (() => {
+          try {
+            const ok = String(window.localStorage?.getItem('drugCardActivated') || '') === '1';
+            return ok ? [{ name: '药诊优享卡', discount: '7折' }] : [];
+          } catch (e) {
+            return [];
+          }
+        })(),
+        drugCardActivated: (() => {
+          try {
+            return String(window.localStorage?.getItem('drugCardActivated') || '') === '1';
+          } catch (e) {
+            return false;
+          }
+        })(),
         showDiscountDetail: false,
         order: { receiver: '', phone: '', address: '', remark: '' },
         ordersStatus: 'pending_payment',
@@ -1337,10 +2056,56 @@
               { name: '家庭常备组合包', spec: '组合包', qty: 1, unitPrice: 68.0, subtotal: 68.0 },
               { name: '【999】感冒灵颗粒', spec: '10g×9袋', qty: 1, unitPrice: 34.3, subtotal: 34.3 }
             ]
+          },
+          {
+            id: 'o5',
+            orderNo: '2865271368010519',
+            createTime: '2026-04-02 06:51:17',
+            status: 'closed',
+            amount: 31.85,
+            receiver: '哥哥哥哥',
+            phoneMask: '139****5585',
+            address: '北京北京市西城区西单北大街120号',
+            shippingText: '订单已关闭 · 未支付',
+            hasRx: true,
+            firstItemName: '【方盛】蒲地蓝消炎片',
+            items: [
+              {
+                drugId: 'c1',
+                type: 'drug',
+                name: '【方盛】蒲地蓝消炎片54片喉咙痛清热解毒',
+                spec: '0.3g*18片*3板',
+                qty: 4,
+                unitPrice: 4.8,
+                subtotal: 19.2,
+                drugKind: 'otc',
+                thumb: './thumbnails/cold-pudilan.png',
+                basePrice: 16
+              },
+              {
+                drugId: 'rx-cefaclor',
+                type: 'drug',
+                name: '【仁和】头孢克洛分散片 0.25g*8片',
+                spec: '0.25g*8片',
+                qty: 1,
+                unitPrice: 12.65,
+                subtotal: 12.65,
+                drugKind: 'rx',
+                thumb: './thumbnails/cold-yinqiao.png',
+                basePrice: 15.8
+              }
+            ]
           }
         ],
         activeOrder: null,
         comboActiveBundle: null,
+        activeTopicSection: null,
+        shortcutDrugTitle: '',
+        shortcutDrugKey: '',
+        searchKeyword: '',
+        searchHasSearched: false,
+        searchHistory: ['头孢', '消炎药'],
+        searchSuggests: ['儿童感冒药', '发热', '咳嗽', '维生素', '牙台', '护手霜', '油', '洗护'],
         comboDetailFrom: 'home',
         comboSelectItems: [],
 
@@ -1437,35 +2202,81 @@
         ],
 
         quickAccess: [
-          { name: '慢病问诊', icon: 'ri-stethoscope-line' },
-          { name: '便捷用药', icon: 'ri-capsule-line' },
           { name: '问诊用药', icon: 'ri-file-list-3-line' },
-          { name: '组合购药', icon: 'ri-inbox-archive-line' }
+          { name: '便捷购药', icon: 'ri-capsule-line' }
         ],
         banners: [
           { title: '热门活动 · 春季健康季', bg: 'bg-gradient-to-r from-rose-500 to-pink-600' },
           { title: '商品推荐 · 家庭常备药', bg: 'bg-gradient-to-r from-blue-500 to-indigo-600' },
-          { title: '权益专享 · 药诊卡8折起', bg: 'bg-gradient-to-r from-emerald-500 to-teal-600' }
+          { title: '权益专享 · 药诊卡7折起', bg: 'bg-gradient-to-r from-emerald-500 to-teal-600' }
         ],
         categories8: [
           { name: '推荐', icon: 'ri-star-smile-line' },
           { name: '感冒发烧', icon: 'ri-mental-health-line' },
-          { name: '常备药品', icon: 'ri-medicine-bottle-line' },
+          { name: '家庭常备', icon: 'ri-medicine-bottle-line' },
           { name: '咳嗽咽痛', icon: 'ri-lungs-line' },
           { name: '儿童用药', icon: 'ri-bear-smile-line' },
           { name: '皮肤用药', icon: 'ri-drop-line' },
           { name: '原研好药', icon: 'ri-award-line' },
           { name: '自营药房', icon: 'ri-store-2-line' }
         ],
+        topicSections: [
+          {
+            id: 'subsidy',
+            title: '百亿补贴',
+            cardClass: 'bg-gradient-to-b from-red-500 to-red-600 border-red-300',
+            titleClass: 'text-white',
+            items: [
+              { name: '喷雾防晒', thumb: './thumbnails/cold-pudilan.png', subsidy: '69.1元', price: '29.9', drugKind: 'otc', highlight: true },
+              { name: '身体乳', thumb: './thumbnails/child-yikexin.png', subsidy: '9.6元', price: '67.9', drugKind: 'otc', highlight: true }
+            ]
+          },
+          {
+            id: 'hot',
+            title: '热卖榜单',
+            cardClass: 'bg-white border-slate-100',
+            titleClass: 'text-slate-800',
+            items: [
+              { name: '蒲地蓝消炎片', thumb: './thumbnails/cold-pudilan.png', subsidy: '11.2元', price: '4.8', drugKind: 'otc', highlight: false },
+              { name: '纯牛奶', thumb: './thumbnails/cold-ganma.png', subsidy: '25.9元', price: '29.9', drugKind: 'otc', highlight: true }
+            ]
+          },
+          {
+            id: 'medicine-plan',
+            title: '国民药品保障计划',
+            cardClass: 'bg-[#eef8f2] border-[#d6ebdf]',
+            titleClass: 'text-slate-800',
+            items: [
+              { name: '开塞露', thumb: './thumbnails/child-rulact.png', subsidy: '0元', price: '1', drugKind: 'otc', highlight: false },
+              { name: '珍珠明目滴眼液', thumb: './thumbnails/child-jianwei.png', subsidy: '2.3元', price: '1', drugKind: 'otc', highlight: false },
+              { name: '桂林西瓜霜含片', thumb: './thumbnails/cold-yinqiao.png', subsidy: '7.5元', price: '3.2', drugKind: 'otc', highlight: false },
+              { name: '家中常备', thumb: './thumbnails/cold-ganma.png', subsidy: '33.1元', price: '5.9', drugKind: 'rx', highlight: false },
+              { name: '创口贴', thumb: './thumbnails/cold-pudilan.png', subsidy: '5元', price: '15', drugKind: 'otc', highlight: false },
+              { name: '食欲不振消化不良', thumb: './thumbnails/child-rulact.png', subsidy: '22元', price: '7.9', drugKind: 'otc', highlight: false }
+            ]
+          },
+          {
+            id: 'nutrition-plan',
+            title: '国民营养保障计划',
+            cardClass: 'bg-[#f7f2e6] border-[#ece3cf]',
+            titleClass: 'text-slate-800',
+            items: [
+              { name: '奥运冠军推荐', thumb: './thumbnails/child-yikexin.png', subsidy: '40元', price: '29', drugKind: 'otc', highlight: false },
+              { name: '智能体脂秤', thumb: './thumbnails/cold-yinqiao.png', subsidy: '10元', price: '49.9', drugKind: 'otc', highlight: false }
+            ]
+          }
+        ],
         drugsCold: [
-          { id: 'c1', type: 'drug', name: '【方盛】蒲地蓝消炎片54片喉咙痛清热...', thumb: './thumbnails/cold-pudilan.png', price: 4.8, subsidy: 0, effect: '清热解毒，抗炎消肿。', usage: '口服。一次5～8片，一日4次。', expiry: '24个月', taboo: '对本品过敏者禁用。', spec: '54片/盒', sold: '1.2万+' },
-          { id: 'c2', type: 'drug', name: '【999】感冒灵颗粒10g9袋头痛发热鼻...', thumb: './thumbnails/cold-ganma.png', price: 9.9, subsidy: 0, effect: '解热镇痛。', usage: '开水冲服。一次1袋，一日3次。', expiry: '24个月', taboo: '风寒感冒者慎用。', spec: '10g×9袋', sold: '8千+' },
-          { id: 'c3', type: 'drug', name: '【百灵鸟】维C银翘片24片感冒咳嗽感冒⋯', thumb: './thumbnails/cold-yinqiao.png', price: 4.2, subsidy: 0, effect: '疏风解表，清热解毒。', usage: '口服。一次2片，一日3次。', expiry: '24个月', taboo: '肝肾功能不全者慎用。', spec: '24片/盒', sold: '6千+' }
+          { id: 'c1', type: 'drug', drugKind: 'otc', name: '【方盛】蒲地蓝消炎片54片喉咙痛清热解毒 咽炎抗炎消肿咽喉肿痛疖肿', thumb: './thumbnails/cold-pudilan.png', price: 4.8, subsidy: 0, effect: '清热解毒，抗炎消肿。用于疖肿、咽炎、扁桃体炎。', usage: '口服 一日4次 一次6片', expiry: '24个月', taboo: '对本品及所含成份过敏者禁用。', spec: '54片/盒', sold: '71.6万件', effectTags: ['清热解毒', '抗炎消肿'], rankBadge: '综合热卖榜 TOP.1', deliverCity: '北京市 北京市 东城区' },
+          { id: 'rx-cefaclor', type: 'drug', drugKind: 'rx', name: '【仁和】头孢克洛分散片 0.25g*8片', thumb: './thumbnails/cold-yinqiao.png', price: 15.8, subsidy: 0, effect: '适用于敏感菌所致的呼吸道感染、泌尿生殖系统感染等。', usage: '口服。成人常用量一次0.25g，一日3次，遵医嘱。', expiry: '24个月', taboo: '对头孢菌素类抗生素过敏者禁用。', spec: '0.25g*8片', sold: '2.6万件', rxConflictWithIds: ['rx-cefixime'] },
+          { id: 'rx-cefixime', type: 'drug', drugKind: 'rx', name: '【仁和】头孢克肟颗粒', thumb: './thumbnails/cold-pudilan.png', price: 22.0, subsidy: 0, effect: '适用于敏感菌引起的感染。', usage: '口服，遵医嘱。', expiry: '24个月', taboo: '对头孢菌素过敏者禁用。', spec: '50mg*6袋', sold: '1.2万件', rxConflictWithIds: ['rx-cefaclor'] },
+          { id: 'c2', type: 'drug', drugKind: 'rx', name: '【999】感冒灵颗粒10g9袋头痛发热鼻...', thumb: './thumbnails/cold-ganma.png', price: 9.9, subsidy: 0, effect: '解热镇痛。', usage: '开水冲服。一次1袋，一日3次。', expiry: '24个月', taboo: '风寒感冒者慎用。', spec: '10g×9袋', sold: '8千+' },
+          { id: 'c3', type: 'drug', drugKind: 'otc', name: '【百灵鸟】维C银翘片24片感冒咳嗽感冒⋯', thumb: './thumbnails/cold-yinqiao.png', price: 4.2, subsidy: 0, effect: '疏风解表，清热解毒。', usage: '口服。一次2片，一日3次。', expiry: '24个月', taboo: '肝肾功能不全者慎用。', spec: '24片/盒', sold: '6千+' }
         ],
         drugsChild: [
-          { id: 'k1', type: 'drug', name: '【江中】乳酸菌素片36片养出益生菌大...', thumb: './thumbnails/child-rulact.png', price: 7.6, subsidy: 0, effect: '用于肠内异常发酵、消化不良等。', usage: '嚼服。儿童酌减。', expiry: '24个月', taboo: '对乳糖过敏者慎用。', spec: '36片/盒', sold: '5千+' },
-          { id: 'k2', type: 'drug', name: '【伊可新】维生素AD滴剂（胶囊型）10s3⋯', thumb: './thumbnails/child-yikexin.png', price: 33, subsidy: 0, effect: '用于预防和治疗维生素A及D缺乏症。', usage: '按说明书或医嘱服用。', expiry: '18个月', taboo: '慢性肾功能衰竭、高钙血症禁用。', spec: '10粒×3板', sold: '2万+' },
-          { id: 'k3', type: 'drug', name: '【江中】健胃消食片36片肚子胀消化不…', thumb: './thumbnails/child-jianwei.png', price: 8.4, subsidy: 0, effect: '健胃消食。', usage: '口服或咀嚼。', expiry: '24个月', taboo: '孕妇、哺乳期遵医嘱。', spec: '36片/盒', sold: '9千+' }
+          { id: 'k1', type: 'drug', drugKind: 'otc', name: '【江中】乳酸菌素片36片养出益生菌大...', thumb: './thumbnails/child-rulact.png', price: 7.6, subsidy: 0, effect: '用于肠内异常发酵、消化不良等。', usage: '嚼服。儿童酌减。', expiry: '24个月', taboo: '对乳糖过敏者慎用。', spec: '36片/盒', sold: '5千+' },
+          { id: 'k2', type: 'drug', drugKind: 'otc', name: '【伊可新】维生素AD滴剂（胶囊型）10s3⋯', thumb: './thumbnails/child-yikexin.png', price: 33, subsidy: 0, effect: '用于预防和治疗维生素A及D缺乏症。', usage: '按说明书或医嘱服用。', expiry: '18个月', taboo: '慢性肾功能衰竭、高钙血症禁用。', spec: '10粒×3板', sold: '2万+' },
+          { id: 'k3', type: 'drug', drugKind: 'otc', name: '【江中】健胃消食片36片肚子胀消化不…', thumb: './thumbnails/child-jianwei.png', price: 8.4, subsidy: 0, effect: '健胃消食。', usage: '口服或咀嚼。', expiry: '24个月', taboo: '孕妇、哺乳期遵医嘱。', spec: '36片/盒', sold: '9千+' }
         ],
         comboPacks: [
           { id: 'p1', title: '家庭常备组合包', desc: '感冒、肠胃、消炎常备药一站配齐', detail: '针对家庭日常小病小痛，科学搭配常用药（演示文案），下单后由药师审核并发货。', items: ['感冒药（示意）', '肠胃药（示意）', '外用消炎（示意）'], price: 68 },
@@ -1477,8 +2288,83 @@
         get comboPurchaseHomeRow() {
           return this.comboPurchaseBundles.slice(0, 3);
         },
+        get searchResults() {
+          const kw = (this.searchKeyword || '').trim();
+          const all = [...this.drugsCold, ...this.drugsChild];
+          if (!kw) return all.slice(0, 6);
+          return all.filter(d => d.name.includes(kw));
+        },
+        get recommendDrugs() {
+          return [...this.drugsCold, ...this.drugsChild].slice(0, 8);
+        },
+        get familyReserveDrugs() {
+          return [
+            { id: 'fr1', type: 'drug', drugKind: 'otc', name: '【康恩贝】肠炎宁片0.42g*...', thumb: './thumbnails/cold-pudilan.png', price: 15.8, effect: '', usage: '', expiry: '24个月', taboo: '', spec: '常规装', sold: '热销' },
+            { id: 'fr2', type: 'drug', drugKind: 'rx', name: '【云南白药】云南白药气雾...', thumb: './thumbnails/cold-yinqiao.png', price: 52.8, effect: '', usage: '', expiry: '24个月', taboo: '', spec: '常规装', sold: '热销' },
+            { id: 'fr3', type: 'drug', drugKind: 'otc', name: '【仁和】布洛芬缓释胶囊 0....', thumb: './thumbnails/cold-ganma.png', price: 11.9, effect: '', usage: '', expiry: '24个月', taboo: '', spec: '常规装', sold: '热销' },
+            { id: 'fr4', type: 'drug', drugKind: 'otc', name: '【三金】桂林西瓜霜含片0.6...', thumb: './thumbnails/child-jianwei.png', price: 3.2, effect: '', usage: '', expiry: '24个月', taboo: '', spec: '常规装', sold: '热销' },
+            { id: 'fr5', type: 'drug', drugKind: 'rx', name: '【雅塑】奥利司他胶囊0.12...', thumb: './thumbnails/child-yikexin.png', price: 58.0, effect: '', usage: '', expiry: '24个月', taboo: '', spec: '常规装', sold: '热销' },
+            { id: 'fr6', type: 'drug', drugKind: 'otc', name: '【老白健康】氨糖软骨素贴...', thumb: './thumbnails/child-rulact.png', price: 9.9, effect: '', usage: '', expiry: '24个月', taboo: '', spec: '常规装', sold: '热销' },
+            { id: 'fr7', type: 'drug', drugKind: 'otc', name: '【老白健康】晚安睡眠贴（...', thumb: './thumbnails/cold-yinqiao.png', price: 5.9, effect: '', usage: '', expiry: '24个月', taboo: '', spec: '常规装', sold: '热销' },
+            { id: 'fr8', type: 'drug', drugKind: 'otc', name: '【老白健康】蛋白粉（老白...', thumb: './thumbnails/child-yikexin.png', price: 15.0, effect: '', usage: '', expiry: '24个月', taboo: '', spec: '常规装', sold: '热销' },
+            { id: 'fr9', type: 'drug', drugKind: 'otc', name: '【老白健康】决明子叶黄素...', thumb: './thumbnails/child-rulact.png', price: 7.9, effect: '', usage: '', expiry: '24个月', taboo: '', spec: '常规装', sold: '热销' }
+          ];
+        },
+        get selectedHasRx() {
+          return this.selectedItems.some(i => i.type === 'drug' && (i.drugKind || 'otc') === 'rx');
+        },
+        get selectedRxDrugItems() {
+          return this.selectedItems.filter(i => i.type === 'drug' && (i.drugKind || 'otc') === 'rx');
+        },
+        get rxActivePatient() {
+          return this.rxPatients.find(p => p.id === this.rxSelectedPatientId) || null;
+        },
+        get shortcutDrugItems() {
+          if (this.shortcutDrugKey === 'cold') return this.drugsCold;
+          if (this.shortcutDrugKey === 'child') return this.drugsChild;
+          return [];
+        },
         get showBottomNav() {
-          return this.view === 'main' && !this.detailPage;
+          return this.view !== 'login';
+        },
+        get navHomeActive() {
+          return this.view === 'main' && this.tab === 'home' && !this.detailPage;
+        },
+        get navCartActive() {
+          return this.view === 'main' && this.tab === 'cart';
+        },
+        get navProfileActive() {
+          return this.view === 'main' && this.tab === 'profile';
+        },
+        resetToMainShell() {
+          if (this.view === 'rxCheckout') {
+            this.rxPrescriptionComplete = false;
+          }
+          this.closeDetail();
+          this.activeTopicSection = null;
+          this.shortcutDrugTitle = '';
+          this.shortcutDrugKey = '';
+          this.activeOrder = null;
+          this.comboActiveBundle = null;
+          this.comboSelectItems = [];
+          this.comboDetailFrom = 'home';
+          this.view = 'main';
+          this.rxCheckoutStep = 1;
+        },
+        bottomNavHome() {
+          this.resetToMainShell();
+          this.tab = 'home';
+          this.cartStep = 1;
+        },
+        bottomNavCart() {
+          this.resetToMainShell();
+          this.tab = 'cart';
+          this.cartStep = 1;
+        },
+        bottomNavProfile() {
+          this.resetToMainShell();
+          this.tab = 'profile';
+          this.cartStep = 1;
         },
         get comboSelectAllChecked() {
           return this.comboSelectItems.length > 0 && this.comboSelectItems.every(i => i.selected);
@@ -1497,8 +2383,117 @@
         },
 
         onQuickAccess(q) {
-          if (q.name === '组合购药') this.openComboPurchaseList();
-          else this.toast(q.name + '（演示）');
+          if (q.name === '便捷购药' || q.name === '问诊用药') {
+            this.toast('参照线上流程（如需）');
+            return;
+          }
+          this.toast(q.name + '（演示）');
+        },
+        onCategoryShortcut(c) {
+          if (c.name === '推荐') {
+            this.view = 'recommendList';
+            return;
+          }
+          if (c.name === '感冒发烧') {
+            this.shortcutDrugTitle = '感冒用药';
+            this.shortcutDrugKey = 'cold';
+            this.view = 'shortcutDrugList';
+            return;
+          }
+          if (c.name === '儿童用药') {
+            this.shortcutDrugTitle = '儿童用药';
+            this.shortcutDrugKey = 'child';
+            this.view = 'shortcutDrugList';
+            return;
+          }
+          if (c.name === '家庭常备') {
+            this.view = 'familyReserve';
+            return;
+          }
+          this.toast(c.name + '（演示）');
+        },
+        closeShortcutDrugList() {
+          this.shortcutDrugTitle = '';
+          this.shortcutDrugKey = '';
+          this.view = 'main';
+          this.tab = 'home';
+        },
+        closeFamilyReserve() {
+          this.view = 'main';
+          this.tab = 'home';
+        },
+        openTopicSection(topic) {
+          this.activeTopicSection = topic;
+          this.view = 'topicList';
+        },
+        closeTopicSection() {
+          this.activeTopicSection = null;
+          this.view = 'main';
+          this.tab = 'home';
+        },
+        closeRecommendList() {
+          this.view = 'main';
+          this.tab = 'home';
+        },
+        get drugShowEquity() {
+          return this.loggedIn && this.drugCardActivated;
+        },
+        drugOriginalPrice(d) {
+          return Number(d?.price ?? d?.basePrice ?? 0);
+        },
+        drugEquityPrice(d) {
+          return this.drugOriginalPrice(d) * this.equityDiscount;
+        },
+        drugSavedAmount(d) {
+          return this.drugOriginalPrice(d) * (1 - this.equityDiscount);
+        },
+        topicItemOriginal(it) {
+          return Number(it?.price || 0);
+        },
+        topicItemEquity(it) {
+          return this.topicItemOriginal(it) * this.equityDiscount;
+        },
+        topicItemSaved(it) {
+          return this.topicItemOriginal(it) * (1 - this.equityDiscount);
+        },
+        topicItemAsDrug(it) {
+          return {
+            id: 'topic-view-' + it.name + '-' + String(it.price),
+            type: 'drug',
+            drugKind: it.drugKind || 'otc',
+            name: it.name,
+            thumb: it.thumb,
+            price: this.topicItemOriginal(it),
+            effect: '',
+            usage: '',
+            expiry: '24个月',
+            taboo: '',
+            spec: '常规装',
+            sold: '热销'
+          };
+        },
+        addTopicItemToCart(it) {
+          this.addToCart(this.topicItemAsDrug(it));
+        },
+        openSearch() {
+          this.searchKeyword = '';
+          this.searchHasSearched = false;
+          this.view = 'search';
+        },
+        closeSearch() {
+          this.view = 'main';
+          this.tab = 'home';
+        },
+        submitSearch() {
+          const kw = (this.searchKeyword || '').trim();
+          this.searchHasSearched = true;
+          if (!kw) return;
+          if (!this.searchHistory.includes(kw)) this.searchHistory.unshift(kw);
+          this.searchHistory = this.searchHistory.slice(0, 8);
+        },
+        selectSearchKeyword(k) {
+          this.searchKeyword = k;
+          this.submitSearch();
         },
         openComboPurchaseList() {
           this.view = 'comboList';
@@ -1572,12 +2567,101 @@
         },
         closeOrderDetail() {
           this.activeOrder = null;
-          this.view = 'ordersList';
+          this.showDeleteOrderConfirm = false;
+          if (this.orderDetailBackTo === 'main') {
+            this.view = 'main';
+            this.orderDetailBackTo = 'ordersList';
+          } else {
+            this.view = 'ordersList';
+          }
+        },
+        backToHomeFromOrderDetail() {
+          this.activeOrder = null;
+          this.view = 'main';
+          this.tab = 'home';
+          this.orderDetailBackTo = 'ordersList';
+        },
+        copyOrderNo(no) {
+          const t = String(no || '');
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(t).then(() => this.toast('已复制')).catch(() => this.toast(t));
+          } else {
+            this.toast('订单号：' + t);
+          }
+        },
+        openDeleteOrderConfirm() {
+          this.showDeleteOrderConfirm = true;
+        },
+        executeDeleteOrder() {
+          if (!this.activeOrder) return;
+          const id = this.activeOrder.id;
+          this.orders = this.orders.filter(o => o.id !== id);
+          this.showDeleteOrderConfirm = false;
+          this.activeOrder = null;
+          if (this.orderDetailBackTo === 'main') {
+            this.view = 'main';
+            this.tab = 'home';
+            this.orderDetailBackTo = 'ordersList';
+          } else {
+            this.view = 'ordersList';
+          }
+          this.toast('订单已删除');
+        },
+        cancelPendingOrderToClosed(orderId) {
+          const o = this.orders.find(x => x.id === orderId);
+          if (!o || o.status !== 'pending_payment') return;
+          o.status = 'closed';
+          o.shippingText = '订单已关闭 · 未支付';
+          o.hasRx = o.items && o.items.some(it => (it.drugKind || 'otc') === 'rx');
+          if (this.activeOrder && this.activeOrder.id === orderId) this.activeOrder = o;
+          this.toast('订单已关闭');
+        },
+        findCatalogDrug(drugId) {
+          return [...this.drugsCold, ...this.drugsChild].find(d => d.id === drugId);
+        },
+        reorderOneLineFromOrder(it) {
+          this.reorderLineToCart(it);
+          this.view = 'main';
+          this.tab = 'cart';
+          this.cartStep = 1;
+        },
+        reorderLineToCart(it, silent) {
+          const qty = Math.max(1, Number(it.qty) || 1);
+          const drugId = it.drugId;
+          const catalog = drugId ? this.findCatalogDrug(drugId) : null;
+          if (catalog) {
+            for (let i = 0; i < qty; i++) this.addToCart(catalog, { silent: true });
+            if (!silent) this.toast('已加入购物车');
+            return;
+          }
+          const basePrice = Number(it.basePrice ?? it.unitPrice ?? (it.subtotal / Math.max(1, it.qty)) ?? 0);
+          const unit = this.drugCardActivated ? basePrice * this.equityDiscount : basePrice;
+          const saving = this.drugCardActivated ? basePrice * (1 - this.equityDiscount) : 0;
+          this.cartItems.push({
+            id: 're-' + Date.now() + '-' + Math.random().toString(36).slice(2),
+            type: 'drug',
+            drugKind: it.drugKind || 'otc',
+            name: it.name,
+            thumb: it.thumb || '',
+            basePrice,
+            price: unit,
+            subsidy: saving,
+            qty,
+            checked: true,
+            spec: it.spec || '',
+            effect: it.effect || '',
+            usage: it.usage || '',
+            expiry: it.expiry || '24个月',
+            taboo: it.taboo || '',
+            sold: it.sold || '热销'
+          });
+          if (!silent) this.toast('已加入购物车');
         },
         orderStatusPill(status) {
           if (status === 'pending_payment') return { txt: '待支付', cls: 'bg-brand-50 text-brand-700 border border-brand-200' };
           if (status === 'paid') return { txt: '已支付', cls: 'bg-emerald-50 text-emerald-700 border border-emerald-200' };
           if (status === 'waiting_receipt') return { txt: '待收货', cls: 'bg-orange-50 text-orange-700 border border-orange-200' };
+          if (status === 'closed') return { txt: '订单关闭', cls: 'bg-slate-100 text-slate-600 border border-slate-200' };
           return { txt: '已完成', cls: 'bg-slate-50 text-slate-700 border border-slate-200' };
         },
         get filteredOrders() {
@@ -1600,28 +2684,16 @@
           this.toast('确认收货成功（演示）');
         },
         reorderFromActive() {
+          this.reorderAllFromActive();
+        },
+        reorderAllFromActive() {
           if (!this.activeOrder) return;
           const o = this.activeOrder;
-          o.items.slice(0, 3).forEach(it => {
-            this.addToCart({
-              id: 're-' + it.name,
-              name: it.name,
-              price: it.unitPrice || (it.subtotal / Math.max(1, it.qty || 1)),
-              subsidy: 0,
-              qty: 1,
-              checked: true,
-              effect: '',
-              usage: '',
-              expiry: '24个月',
-              taboo: '',
-              spec: it.spec || '',
-              sold: '热售'
-            });
-          });
+          o.items.forEach(it => this.reorderLineToCart(it, true));
           this.view = 'main';
           this.tab = 'cart';
           this.cartStep = 1;
-          this.toast('已加入购物车（演示）');
+          this.toast('已加入购物车（共 ' + o.items.length + ' 种商品）');
         },
 
         goActivateFromBanner() {
@@ -1636,28 +2708,30 @@
 
         drugUnitPrice(d) {
           const base = Number(d.price || 0);
-          return this.drugCardActivated ? base * 0.8 : base;
+          return this.drugCardActivated ? base * this.equityDiscount : base;
         },
 
         drugSavings(d) {
           const base = Number(d.price || 0);
-          return this.drugCardActivated ? base * 0.2 : 0;
+          return this.drugCardActivated ? base * (1 - this.equityDiscount) : 0;
         },
 
         cartItemUnitPrice(item) {
-          // 购物车里“药品”始终以 basePrice 作为原价基准；激活状态变化时可实时反映
           if (item && item.type === 'drug') {
             const basePrice = Number(item.basePrice ?? item.price ?? 0);
-            return this.drugCardActivated ? basePrice * 0.8 : basePrice;
+            return this.drugCardActivated ? basePrice * this.equityDiscount : basePrice;
           }
+          return Number(item?.price ?? 0);
+        },
+        cartItemOriginalUnit(item) {
+          if (item && item.type === 'drug') return Number(item.basePrice ?? item.price ?? 0);
           return Number(item?.price ?? 0);
         },
 
         cartItemUnitSubsidy(item) {
-          // 药品的“已优惠”来自 20% 差额
           if (item && item.type === 'drug') {
             const basePrice = Number(item.basePrice ?? item.price ?? 0);
-            return this.drugCardActivated ? basePrice * 0.2 : 0;
+            return this.drugCardActivated ? basePrice * (1 - this.equityDiscount) : 0;
           }
           return Number(item?.subsidy ?? 0);
         },
@@ -1689,11 +2763,13 @@
         skipLoginForNow() {
           this.loggedIn = false;
           this.drugCardActivated = false;
+          try { window.localStorage?.setItem('drugCardActivated', '0'); } catch (e) {}
           this.equityCards = [];
           this.showDiscountDetail = false;
           this.pendingAction = '';
           this.pendingOrdersStatus = '';
           this.pendingAddToCartDrug = null;
+          this.rxPrescriptionComplete = false;
           this.view = 'main';
           this.toast('暂不登录，可浏览首页（演示）');
         },
@@ -1722,6 +2798,19 @@
             this.view = 'main';
           }
 
+          // 演示：登录后如果用户“已激活”权益卡，则展示 7 折权益价（支持本地持久化）
+          let activated = false;
+          try { activated = String(window.localStorage?.getItem('drugCardActivated') || '') === '1'; } catch (e) {}
+          // 兼容演示一键登录：默认用示例手机号认为已激活
+          if (this.loginPhone === '13999998888') activated = true;
+          if (activated) {
+            this.drugCardActivated = true;
+            if (!Array.isArray(this.equityCards) || this.equityCards.length === 0) {
+              this.equityCards = [{ name: '药诊优享卡', discount: '7折' }];
+            }
+            try { window.localStorage?.setItem('drugCardActivated', '1'); } catch (e) {}
+          }
+
           this.toast('登录成功');
 
           // 登录后补做“药品加购”
@@ -1735,7 +2824,9 @@
           this.equityCards = [];
           this.activeCardIdx = 0;
           this.drugCardActivated = false;
+          try { window.localStorage?.setItem('drugCardActivated', '0'); } catch (e) {}
           this.showDiscountDetail = false;
+          this.rxPrescriptionComplete = false;
           this.pendingAction = '';
           this.pendingOrdersStatus = '';
           this.pendingAddToCartDrug = null;
@@ -1753,9 +2844,10 @@
           if (!this.activateCode.trim()) { this.toast('请输入激活码'); return; }
           if (!this.cardAgree) { this.toast('请阅读并勾选协议'); return; }
           this.equityCards = [
-            { name: '药诊优享卡', discount: '8折' }
+            { name: '药诊优享卡', discount: '7折' }
           ];
           this.drugCardActivated = true;
+          try { window.localStorage?.setItem('drugCardActivated', '1'); } catch (e) {}
           this.showDiscountDetail = false;
           this.activateSuccessModal = true;
         },
@@ -1772,6 +2864,7 @@
           this.activateCode = '';
           this.cardAgree = false;
           this.drugCardActivated = true;
+          try { window.localStorage?.setItem('drugCardActivated', '1'); } catch (e) {}
           this.view = 'main';
         },
 
@@ -1805,7 +2898,7 @@
           this.detailPage = 'equity';
         },
         openDrug(d) {
-          this.detailDrug = { ...d };
+          this.detailDrug = { ...d, drugKind: d.drugKind || 'otc' };
           this.detailPage = 'drug';
         },
         openCombo(pack) {
@@ -1838,7 +2931,8 @@
           this.detailDrug = null;
           this.detailCombo = null;
         },
-        addToCart(d) {
+        addToCart(d, opts) {
+          const silent = opts && opts.silent;
           // 未登录：禁止把“药品”加入购物车（演示规则）
           if (d && d.type === 'drug' && !this.loggedIn) {
             this.pendingAction = 'addToCartDrug';
@@ -1852,9 +2946,18 @@
 
           // 若为药品：根据是否激活药诊卡，写入实际单价与优惠金额
           if (d && d.type === 'drug') {
+            const conflicts = d.rxConflictWithIds || [];
+            for (let j = 0; j < conflicts.length; j++) {
+              const oid = conflicts[j];
+              const other = this.cartItems.find(i => i.id === oid);
+              if (other) {
+                this.toast('您加购的「' + d.name + '」与您购物车内「' + other.name + '」不宜同时使用哦~');
+                return;
+              }
+            }
             const basePrice = Number(d.price || 0);
-            const unit = this.drugCardActivated ? basePrice * 0.8 : basePrice;
-            const saving = this.drugCardActivated ? basePrice * 0.2 : 0;
+            const unit = this.drugCardActivated ? basePrice * this.equityDiscount : basePrice;
+            const saving = this.drugCardActivated ? basePrice * (1 - this.equityDiscount) : 0;
             const ex = this.cartItems.find(i => i.id === d.id);
             if (ex) {
               ex.qty++;
@@ -1865,14 +2968,14 @@
             } else {
               this.cartItems.push({ ...d, type: 'drug', basePrice, qty: 1, checked: true, price: unit, subsidy: saving });
             }
-            this.toast('已加入购物车');
+            if (!silent) this.toast('已加入购物车');
             return;
           }
 
           const ex = this.cartItems.find(i => i.id === d.id);
           if (ex) ex.qty++;
           else this.cartItems.push({ ...d, qty: 1, checked: true });
-          this.toast('已加入购物车');
+          if (!silent) this.toast('已加入购物车');
         },
         addEquityToCart() {
           if (!this.detailEquity) return;
@@ -1920,14 +3023,118 @@
           return Math.max(0, this.selectedTotal - 5);
         },
 
+        closeRxCheckout() {
+          this.view = 'main';
+          this.tab = 'cart';
+          this.cartStep = 1;
+          this.rxCheckoutStep = 1;
+        },
+        openRxPatientSelect() {
+          this.view = 'rxPatientSelect';
+        },
+        openRxAddPatient(from) {
+          this.rxAddPatientFrom = from || 'checkout';
+          this.rxNewName = '';
+          this.rxNewIdCard = '';
+          this.rxNewPhone = '';
+          this.rxNewHealth = '无过往病史、无过敏史、无肝功异常';
+          this.view = 'rxAddPatient';
+        },
+        closeRxAddPatient() {
+          this.view = this.rxAddPatientFrom === 'picker' ? 'rxPatientSelect' : 'rxCheckout';
+        },
+        pickRxPatient(id) {
+          this.rxSelectedPatientId = id;
+          this.view = 'rxCheckout';
+        },
+        setRxDiseaseForItem(itemId, disease) {
+          this.rxDiseaseByItemId = { ...this.rxDiseaseByItemId, [itemId]: disease };
+        },
+        rxConsultTapUpload() {
+          if (this.rxUploadCount >= 5) { this.toast('最多上传5张'); return; }
+          this.rxUploadCount++;
+          this.toast('已添加示意图（演示）');
+        },
+        startRxConsultation() {
+          if (!this.rxSelectedPatientId) { this.toast('请选择用药患者'); return; }
+          const miss = this.selectedRxDrugItems.filter(i => !(this.rxDiseaseByItemId[i.id] || '').length);
+          if (miss.length) { this.toast('请为每个处方药选择确诊疾病'); return; }
+          if (!this.rxAgreementChecked) { this.toast('请阅读并勾选知情同意'); return; }
+          this.rxCheckoutStep = 2;
+        },
+        finishRxCheckout() {
+          this.rxPrescriptionComplete = true;
+          this.view = 'main';
+          this.tab = 'cart';
+          this.cartStep = 2;
+          this.rxCheckoutStep = 1;
+          this.toast('问诊完成，请填写收货地址');
+        },
+        saveRxNewPatient() {
+          const name = (this.rxNewName || '').trim();
+          const idc = (this.rxNewIdCard || '').trim();
+          const phone = (this.rxNewPhone || '').trim();
+          if (!name) { this.toast('请填写真实姓名'); return; }
+          if (!/^\d{17}[\dXx]$/.test(idc)) { this.toast('请填写正确身份证号'); return; }
+          if (!/^1\d{10}$/.test(phone)) { this.toast('请填写正确手机号'); return; }
+          const id = 'p-' + Date.now();
+          const masked = phone.slice(0, 3) + '****' + phone.slice(-4);
+          let age = 25;
+          if (idc.length === 18) {
+            const y = parseInt(idc.slice(6, 10), 10);
+            const m = parseInt(idc.slice(10, 12), 10) - 1;
+            const d = parseInt(idc.slice(12, 14), 10);
+            if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+              const bd = new Date(y, m, d);
+              age = Math.max(1, Math.floor((Date.now() - bd.getTime()) / (365.25 * 24 * 3600 * 1000)));
+            }
+          }
+          this.rxPatients.push({
+            id,
+            name,
+            age,
+            gender: '女',
+            phone,
+            phoneDisplay: masked,
+            idCard: idc,
+            health: (this.rxNewHealth || '').trim() || '无特殊说明'
+          });
+          this.rxSelectedPatientId = id;
+          this.view = this.rxAddPatientFrom === 'picker' ? 'rxPatientSelect' : 'rxCheckout';
+          this.toast('已保存用药人');
+        },
+        buyNowFromDetail() {
+          if (!this.detailDrug) return;
+          this.addToCart(this.detailDrug);
+          this.closeDetail();
+          this.tab = 'cart';
+          this.cartStep = 1;
+          this.toast('已加入购物车');
+        },
+        buyRxFromDetail() {
+          if (!this.detailDrug) return;
+          this.addToCart(this.detailDrug);
+          this.closeDetail();
+          this.tab = 'cart';
+          this.cartStep = 1;
+          this.toast('已加入购物车，结算时将引导完善处方信息');
+        },
         goCartStep2() {
           if (this.selectedCount === 0) return;
+          if (this.selectedHasRx && !this.rxPrescriptionComplete) {
+            this.rxCheckoutStep = 1;
+            this.rxAgreementChecked = true;
+            this.view = 'rxCheckout';
+            return;
+          }
           this.cartStep = 2;
         },
         completePay() {
           this.toast('支付成功（演示）');
           this.cartItems = this.cartItems.filter(i => !i.checked);
           this.cartStep = 1;
+          this.rxPrescriptionComplete = false;
+          this.rxDiseaseByItemId = {};
           this.tab = 'profile';
         }
       };
