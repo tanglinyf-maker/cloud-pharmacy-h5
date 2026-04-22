@@ -332,17 +332,24 @@
           <button type="button" @click="backToProfile()" class="p-2 -ml-1 rounded-xl text-slate-700 text-lg" aria-label="返回">←</button>
           <h1 class="font-bold text-lg text-slate-900 flex-1 text-center pr-8">我的订单</h1>
         </header>
-        <div class="shrink-0 px-3 py-3 bg-white border-b border-slate-100">
-          <div class="flex gap-2">
-            <button type="button" @click="ordersStatus = 'pending_payment'" class="flex-1 py-2 rounded-full text-sm font-semibold border" :class="ordersStatus === 'pending_payment' ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-slate-600 border-slate-200'">待支付</button>
-            <button type="button" @click="ordersStatus = 'paid'" class="flex-1 py-2 rounded-full text-sm font-semibold border" :class="ordersStatus === 'paid' ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-slate-600 border-slate-200'">已支付</button>
+        <div class="shrink-0 bg-white border-b border-slate-100">
+          <div class="flex items-center justify-between px-3 pt-2">
+            <button type="button" @click="ordersStatus = 'all'" class="flex-1 text-center py-3 text-sm font-semibold"
+                    :class="ordersStatus === 'all' ? 'text-brand-600' : 'text-slate-600'">全部</button>
+            <button type="button" @click="ordersStatus = 'pending_payment'" class="flex-1 text-center py-3 text-sm font-semibold"
+                    :class="ordersStatus === 'pending_payment' ? 'text-brand-600' : 'text-slate-600'">待付款</button>
+            <button type="button" @click="ordersStatus = 'paid'" class="flex-1 text-center py-3 text-sm font-semibold"
+                    :class="ordersStatus === 'paid' ? 'text-brand-600' : 'text-slate-600'">待发货</button>
+            <button type="button" @click="ordersStatus = 'waiting_receipt'" class="flex-1 text-center py-3 text-sm font-semibold"
+                    :class="ordersStatus === 'waiting_receipt' ? 'text-brand-600' : 'text-slate-600'">待收货</button>
+            <button type="button" @click="ordersStatus = 'completed'" class="flex-1 text-center py-3 text-sm font-semibold"
+                    :class="ordersStatus === 'completed' ? 'text-brand-600' : 'text-slate-600'">已完成</button>
+            <button type="button" @click="ordersStatus = 'aftersale'" class="flex-1 text-center py-3 text-sm font-semibold"
+                    :class="ordersStatus === 'aftersale' ? 'text-brand-600' : 'text-slate-600'">售后/退款</button>
           </div>
-          <div class="flex gap-2 mt-2">
-            <button type="button" @click="ordersStatus = 'waiting_receipt'" class="flex-1 py-2 rounded-full text-sm font-semibold border" :class="ordersStatus === 'waiting_receipt' ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-slate-600 border-slate-200'">待收货</button>
-            <button type="button" @click="ordersStatus = 'completed'" class="flex-1 py-2 rounded-full text-sm font-semibold border" :class="ordersStatus === 'completed' ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-slate-600 border-slate-200'">已完成</button>
-          </div>
-          <div class="flex gap-2 mt-2">
-            <button type="button" @click="ordersStatus = 'closed'" class="w-full py-2 rounded-full text-sm font-semibold border" :class="ordersStatus === 'closed' ? 'bg-slate-700 text-white border-slate-700' : 'bg-white text-slate-600 border-slate-200'">已关闭</button>
+          <div class="h-[2px] bg-slate-100">
+            <div class="h-full bg-brand-600 transition-all duration-200"
+                 :style="(() => { const map = { all:0, pending_payment:1, paid:2, waiting_receipt:3, completed:4, aftersale:5 }; return 'width:16.666%; transform: translateX(' + ((map[ordersStatus] ?? 0) * 100) + '%)'; })()"></div>
           </div>
         </div>
         <div class="flex-1 overflow-y-auto px-3 py-3 pb-24 safe-pb space-y-3">
@@ -853,6 +860,85 @@
       </div>
     </template>
 
+    <!-- ========== 商品分类：二级页（左类目 + 右商品列表） ========== -->
+    <template x-if="view === 'categoryPage'">
+      <div class="fixed inset-0 z-[58] bg-white max-w-md mx-auto left-0 right-0 flex flex-col">
+        <header class="shrink-0 bg-white border-b border-slate-100 px-3 py-3 flex items-center">
+          <button type="button" @click="closeCategoryPage()" class="w-9 h-9 -ml-1 rounded-xl text-slate-700 text-xl" aria-label="返回">
+            <i class="ri-arrow-left-s-line"></i>
+          </button>
+          <h1 class="flex-1 text-center text-lg font-semibold text-slate-900 pr-8">商品分类</h1>
+        </header>
+
+        <div class="flex-1 min-h-0 flex">
+          <!-- 左侧类目 -->
+          <aside class="w-24 shrink-0 border-r border-slate-100 bg-slate-50 overflow-y-auto">
+            <template x-for="c in categories8" :key="'cat-' + c.name">
+              <button type="button"
+                      @click="selectCategory(c.name)"
+                      class="w-full px-3 py-4 text-sm text-left border-l-4 transition"
+                      :class="categoryActive === c.name ? 'bg-white border-brand-600 text-slate-900 font-semibold' : 'bg-slate-50 border-transparent text-slate-600'">
+                <span x-text="c.name"></span>
+              </button>
+            </template>
+          </aside>
+
+          <!-- 右侧商品 -->
+          <main class="flex-1 overflow-y-auto p-3 pb-28 bg-white">
+            <template x-for="d in categoryItems" :key="'cat-item-' + d.id">
+              <div class="flex items-center gap-3 py-3 border-b border-slate-100">
+                <div class="w-14 h-14 rounded-xl bg-slate-100 overflow-hidden shrink-0 flex items-center justify-center">
+                  <img :src="d.thumb" alt="" class="w-full h-full object-cover" />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-slate-900 line-clamp-2" x-text="d.name"></p>
+                  <p class="text-[11px] text-slate-400 mt-1">热销 <span class="text-slate-500" x-text="d.sold || ''"></span></p>
+                  <div class="mt-1">
+                    <template x-if="!drugShowEquity">
+                      <div class="leading-tight">
+                        <span class="text-red-600 font-bold">¥<span x-text="drugOriginalPrice(d).toFixed(2)"></span></span>
+                        <span class="text-[10px] text-slate-400 line-through ml-1" x-show="false">¥0</span>
+                      </div>
+                    </template>
+                    <template x-if="drugShowEquity">
+                      <div class="leading-tight">
+                        <span class="text-red-600 font-bold">¥<span x-text="drugEquityPrice(d).toFixed(2)"></span></span>
+                        <span class="text-[10px] text-slate-400 line-through ml-1">¥<span x-text="drugOriginalPrice(d).toFixed(2)"></span></span>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+
+                <!-- 加减 -->
+                <div class="shrink-0 flex items-center gap-2">
+                  <template x-if="cartQtyById(d.id) > 0">
+                    <div class="flex items-center gap-2">
+                      <button type="button" @click="decCategoryItem(d)" class="w-8 h-8 rounded-full border border-slate-200 text-slate-600 flex items-center justify-center text-lg leading-none">−</button>
+                      <span class="w-5 text-center text-sm font-semibold text-slate-800" x-text="cartQtyById(d.id)"></span>
+                    </div>
+                  </template>
+                  <button type="button" @click="incCategoryItem(d)" class="w-9 h-9 rounded-full bg-orange-500 text-white flex items-center justify-center text-xl leading-none">+</button>
+                </div>
+              </div>
+            </template>
+          </main>
+        </div>
+
+        <!-- 底部栏 -->
+        <div class="fixed bottom-14 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 px-3 py-3 safe-pb z-[61] flex items-center gap-3">
+          <button type="button" @click="bottomNavCart()" class="shrink-0 w-11 h-11 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center relative" aria-label="购物车">
+            <i class="ri-shopping-cart-2-line text-xl"></i>
+            <span x-show="cartItems.length" class="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-red-500 text-white text-[9px] flex items-center justify-center px-1" x-text="cartItems.length > 99 ? '99+' : cartItems.length"></span>
+          </button>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm text-slate-500">合计</p>
+            <p class="text-lg font-black text-red-600 leading-none">¥<span x-text="categoryCartTotal.toFixed(2)"></span></p>
+          </div>
+          <button type="button" @click="bottomNavCart()" class="shrink-0 px-6 py-3 rounded-full bg-orange-500 text-white text-sm font-bold">立即下单</button>
+        </div>
+      </div>
+    </template>
+
     <!-- ========== 专题位：二级页 ========== -->
     <template x-if="view === 'topicList' && activeTopicSection">
       <div class="fixed inset-0 z-[58] bg-[#f2f2f2] max-w-md mx-auto left-0 right-0 flex flex-col">
@@ -862,84 +948,86 @@
           </button>
           <h1 class="flex-1 text-center text-lg font-semibold text-slate-900 pr-8" x-text="activeTopicSection.title"></h1>
         </header>
-        <div class="flex-1 overflow-y-auto p-3 pb-24 space-y-3 safe-pb">
-          <template x-if="activeTopicSection.id === 'medicine-plan'">
-            <div class="space-y-3">
-              <div class="rounded-2xl overflow-hidden bg-gradient-to-b from-violet-500 to-indigo-600 text-white p-4">
-                <p class="text-2xl font-black leading-tight">国民药品保障计划</p>
-                <p class="text-xs opacity-90 mt-1">解决购药难 购药贵的问题</p>
-                <div class="mt-3 rounded-xl bg-white/15 px-3 py-2 text-[11px]">药品品种多 · 覆盖科室广 · 药品单价低</div>
-                <div class="mt-3 rounded-xl bg-white/10 p-2 h-28 overflow-hidden">
-                  <img src="./thumbnails/cold-pudilan.png" alt="" class="w-full h-full object-cover rounded-lg" />
+        <div class="flex-1 overflow-y-auto pb-24 safe-pb">
+          <!-- Banner + 标题 -->
+          <div class="px-3 pt-3">
+            <div class="rounded-3xl overflow-hidden border shadow-sm" :class="activeTopicSection.bannerClass || 'bg-white border-slate-100'">
+              <div class="p-4 text-white" :class="activeTopicSection.bannerBg || 'bg-gradient-to-r from-slate-700 to-slate-900'">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="text-2xl font-black leading-tight" x-text="activeTopicSection.title"></p>
+                    <p class="text-xs opacity-90 mt-1" x-text="activeTopicSection.subtitle || ''"></p>
+                  </div>
+                  <div class="w-16 h-16 rounded-2xl bg-white/15 overflow-hidden shrink-0 flex items-center justify-center">
+                    <img x-show="activeTopicSection.bannerThumb" :src="activeTopicSection.bannerThumb" alt="" class="w-full h-full object-cover" />
+                    <i x-show="!activeTopicSection.bannerThumb" class="ri-image-line text-2xl text-white/80"></i>
+                  </div>
                 </div>
               </div>
-              <div class="rounded-2xl bg-white border border-slate-100 p-3">
-                <p class="text-sm font-bold text-slate-900">家庭常备药品保障</p>
-                <p class="text-xs text-slate-500 mt-1">日常生活中经常会用到的药品及器械</p>
-              </div>
-              <div class="grid grid-cols-3 gap-2">
-                <template x-for="it in activeTopicSection.items" :key="activeTopicSection.id + '-' + it.name">
-                  <div class="bg-white rounded-xl border border-slate-100 overflow-hidden">
-                    <button type="button" @click="openDrug(topicItemAsDrug(it))" class="h-24 w-full bg-slate-100 overflow-hidden block">
-                      <img :src="it.thumb" alt="" class="w-full h-full object-cover" />
-                    </button>
-                    <div class="p-1.5">
-                      <p class="text-[9px] text-slate-500">
-                        <span class="px-1 py-0.5 rounded border" :class="(it.drugKind || 'otc') === 'rx' ? 'border-amber-300 bg-amber-50 text-amber-800' : 'border-slate-200 bg-slate-50 text-slate-600'" x-text="(it.drugKind || 'otc') === 'rx' ? '处方药' : '非处方药'"></span>
-                      </p>
-                      <p class="text-[10px] text-slate-700 line-clamp-2 min-h-[2.1rem] mt-1" x-text="it.name"></p>
-                      <div class="mt-1">
-                        <template x-if="!drugShowEquity">
-                          <div class="leading-tight">
-                            <p class="text-red-600 text-sm font-bold">¥<span x-text="topicItemOriginal(it).toFixed(2)"></span><span class="text-[10px] font-medium ml-0.5">原价</span></p>
-                            <p class="text-red-500 text-xs mt-0.5">¥?<span class="text-[10px] font-medium ml-0.5">权益价</span></p>
-                          </div>
-                        </template>
-                        <template x-if="drugShowEquity">
-                          <div class="leading-tight">
-                            <p class="text-red-600 text-sm font-bold">¥<span x-text="topicItemEquity(it).toFixed(2)"></span><span class="text-[10px] font-medium ml-0.5">补贴价</span></p>
-                            <p class="text-[10px] text-red-400 mt-0.5">已补 ¥<span x-text="topicItemSaved(it).toFixed(2)"></span></p>
-                          </div>
-                        </template>
-                      </div>
-                      <button type="button" @click.stop="addTopicItemToCart(it)" class="w-full mt-1 py-1 rounded-full bg-red-500 text-white text-[10px] font-semibold">立即抢购 ></button>
-                    </div>
+              <div class="bg-white p-4 space-y-3">
+                <div>
+                  <p class="text-sm font-bold text-slate-900">活动介绍</p>
+                  <p class="text-xs text-slate-600 mt-1 leading-relaxed" x-text="activeTopicSection.intro || '精选榜单与常用好药，覆盖多场景用药需求（演示）。'"></p>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <div class="rounded-2xl bg-amber-50 border border-amber-100 p-3">
+                    <p class="text-[11px] text-amber-700 font-semibold">优惠力度</p>
+                    <p class="text-sm font-black text-amber-900 mt-1" x-text="activeTopicSection.discountPower || '权益价 7 折起（演示）'"></p>
                   </div>
-                </template>
+                  <div class="rounded-2xl bg-emerald-50 border border-emerald-100 p-3">
+                    <p class="text-[11px] text-emerald-700 font-semibold">宣传介绍</p>
+                    <p class="text-xs text-emerald-900 mt-1 leading-snug" x-text="activeTopicSection.promo || '好药保供｜用药无忧（演示）'"></p>
+                  </div>
+                </div>
               </div>
             </div>
-          </template>
+          </div>
 
-          <template x-if="activeTopicSection.id !== 'medicine-plan'">
-            <div class="grid grid-cols-2 gap-3">
-              <template x-for="it in activeTopicSection.items" :key="activeTopicSection.id + '-' + it.name">
-                <div class="bg-white rounded-2xl border border-slate-100 p-2.5 flex flex-col">
-                  <button type="button" @click="openDrug(topicItemAsDrug(it))" class="rounded-xl bg-slate-50 h-28 overflow-hidden flex items-center justify-center">
-                    <img :src="it.thumb" alt="" class="w-full h-full object-cover" />
-                  </button>
-                  <p class="text-[10px] text-slate-500 mt-2">
-                    <span class="px-1.5 py-0.5 rounded border text-[9px]" :class="(it.drugKind || 'otc') === 'rx' ? 'border-amber-300 bg-amber-50 text-amber-800' : 'border-slate-200 bg-slate-50 text-slate-600'" x-text="(it.drugKind || 'otc') === 'rx' ? '处方药' : '非处方药'"></span>
-                  </p>
-                  <p class="text-[11px] text-slate-700 mt-1 line-clamp-2 min-h-[2.1rem]" x-text="it.name"></p>
-                  <div class="mt-2 flex-1">
-                    <template x-if="!drugShowEquity">
-                      <div class="leading-tight">
-                        <p class="text-red-600 font-bold text-lg">¥<span x-text="topicItemOriginal(it).toFixed(2)"></span><span class="text-[11px] font-medium ml-0.5">原价</span></p>
-                        <p class="text-red-500 text-sm mt-0.5">¥?<span class="text-[11px] font-medium ml-0.5">权益价</span></p>
-                      </div>
-                    </template>
-                    <template x-if="drugShowEquity">
-                      <div class="leading-tight">
-                        <p class="text-red-600 font-bold text-lg">¥<span x-text="topicItemEquity(it).toFixed(2)"></span><span class="text-[11px] font-medium ml-0.5">补贴价</span></p>
-                        <p class="mt-1 inline-flex items-center px-2 py-0.5 rounded-md text-[11px] text-red-500 border border-red-200 bg-red-50">已补 ¥<span x-text="topicItemSaved(it).toFixed(2)"></span></p>
-                      </div>
-                    </template>
+          <!-- 榜单模块 -->
+          <div class="px-3 mt-4 space-y-4">
+            <template x-for="sec in (activeTopicSection.sections || [])" :key="activeTopicSection.id + '-' + sec.key">
+              <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-4">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="text-base font-black text-slate-900" x-text="sec.title"></p>
+                    <p class="text-xs text-slate-500 mt-1" x-text="sec.desc"></p>
                   </div>
-                  <button type="button" @click.stop="addTopicItemToCart(it)" class="mt-2 w-full py-2 rounded-full bg-red-500 text-white text-[11px] font-semibold">立即抢购 ></button>
+                  <span class="text-xs text-brand-600 font-semibold">更多 ›</span>
                 </div>
-              </template>
-            </div>
-          </template>
+
+                <div class="grid grid-cols-3 gap-2 mt-3">
+                  <template x-for="it in topicSectionItems(activeTopicSection, sec.key).slice(0, 6)" :key="activeTopicSection.id + '-' + sec.key + '-' + (it.drugId || it.name)">
+                    <div class="rounded-2xl border border-slate-100 overflow-hidden bg-white flex flex-col">
+                      <button type="button" @click="openDrug(topicItemAsDrug(it))" class="h-24 w-full bg-slate-100 overflow-hidden">
+                        <img :src="it.thumb" alt="" class="w-full h-full object-cover" />
+                      </button>
+                      <div class="p-2 flex-1 flex flex-col">
+                        <p class="text-[10px] font-semibold text-slate-800 line-clamp-2 leading-snug">
+                          <span x-show="(it.drugKind || 'otc') === 'rx'" class="text-red-600">【处方药】</span>
+                          <span x-text="it.name"></span>
+                        </p>
+                        <div class="mt-2">
+                          <template x-if="!drugShowEquity">
+                            <div class="leading-tight">
+                              <p class="text-red-600 font-bold text-sm">¥<span x-text="topicItemOriginal(it).toFixed(2)"></span><span class="text-[10px] ml-0.5">原价</span></p>
+                              <p class="text-red-500 text-[10px] mt-0.5">¥?<span class="ml-0.5">权益价</span></p>
+                            </div>
+                          </template>
+                          <template x-if="drugShowEquity">
+                            <div class="leading-tight">
+                              <p class="text-red-600 font-bold text-sm">¥<span x-text="topicItemEquity(it).toFixed(2)"></span><span class="text-[10px] ml-0.5">补贴价</span></p>
+                              <p class="text-[10px] text-red-500 mt-0.5">已补贴¥<span x-text="topicItemSaved(it).toFixed(2)"></span></p>
+                            </div>
+                          </template>
+                        </div>
+                        <button type="button" @click.stop="addTopicItemToCart(it)" class="mt-2 w-full py-1.5 rounded-full bg-red-500 text-white text-[10px] font-semibold">立即抢购 ></button>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
         </div>
       </div>
     </template>
@@ -1188,10 +1276,10 @@
           <div class="px-3 mt-3">
             <button type="button" @click="view = 'cardActivate'; activatePhone = loginPhone" class="w-full rounded-2xl bg-gradient-to-r from-red-500 to-orange-500 text-white text-left px-4 py-3 shadow-md shadow-orange-200/50 flex items-center justify-between active:opacity-95">
               <div>
-                <p class="text-sm font-bold">药诊优享卡</p>
-                <p class="text-[11px] opacity-90 mt-0.5">问诊购药最高补贴70% · 点击了解并激活</p>
+                <p class="text-sm font-bold">华润e·药惠通</p>
+                <p class="text-[11px] opacity-90 mt-0.5">好药保供｜用药无忧</p>
               </div>
-              <span class="text-xs bg-white/20 px-2 py-1 rounded-lg">去激活</span>
+              <span class="text-xs bg-white/20 px-2 py-1 rounded-lg">权益激活</span>
             </button>
           </div>
 
@@ -1229,7 +1317,7 @@
             </div>
           </div>
 
-          <!-- 专题位（2x2） -->
+        <!-- 专区（2行x2列） -->
           <div class="px-3 mt-4">
             <div class="grid grid-cols-2 gap-3">
               <template x-for="topic in topicSections" :key="topic.id">
@@ -1244,8 +1332,20 @@
                         <div class="h-24 rounded-lg overflow-hidden bg-white/70">
                           <img :src="it.thumb" alt="" class="w-full h-full object-cover" />
                         </div>
-                        <p class="mt-1 text-center rounded-full border text-[10px] py-0.5" :class="it.highlight ? 'text-white bg-red-500 border-red-500' : 'text-red-500 border-red-200 bg-red-50'" x-text="'已补' + it.subsidy"></p>
-                        <p class="text-center text-red-600 text-2xl font-bold leading-none mt-1">¥<span x-text="it.price"></span></p>
+                      <div class="mt-1 leading-tight">
+                        <template x-if="!loggedIn">
+                          <div>
+                            <p class="text-red-600 font-bold text-sm text-center">¥<span x-text="Number(it.originalPrice ?? it.price ?? 0).toFixed(2)"></span><span class="text-[10px] ml-0.5">原价</span></p>
+                            <p class="text-red-500 text-[10px] mt-0.5 text-center">¥?<span class="ml-0.5">权益价</span></p>
+                          </div>
+                        </template>
+                        <template x-if="loggedIn">
+                          <div>
+                            <p class="text-[10px] text-red-500 text-center" x-text="'已补贴' + Number(it.subsidyAmount ?? 0).toFixed(1) + '元'"></p>
+                            <p class="text-red-600 font-bold text-sm text-center">¥<span x-text="Number(it.salePrice ?? it.price ?? 0).toFixed(2)"></span><span class="text-[10px] ml-0.5">补贴价</span></p>
+                          </div>
+                        </template>
+                      </div>
                       </div>
                     </template>
                   </div>
@@ -1290,9 +1390,13 @@
         <!-- 购物车 -->
         <div x-show="tab === 'cart'" class="pb-40">
           <header class="sticky top-0 z-10 bg-[#6B5BC8] text-white px-3 py-3 flex items-center justify-between">
-            <span class="w-8"></span>
-            <h1 class="font-semibold text-base">购物车</h1>
+            <button type="button" class="w-8 h-8 rounded-xl flex items-center justify-center" x-show="cartStep > 1" @click="cartStep = 1" aria-label="返回">
+              <i class="ri-arrow-left-s-line text-xl"></i>
+            </button>
+            <span class="w-8" x-show="cartStep === 1"></span>
+            <h1 class="font-semibold text-base" x-text="cartStep === 1 ? '购物车' : '确认订单'"></h1>
             <span class="text-xs text-white/90 w-8 text-right" x-show="cartStep === 1" @click="toast('编辑（演示）')">编辑</span>
+            <span class="w-8" x-show="cartStep > 1"></span>
           </header>
           <div x-show="cartStep === 1" class="bg-orange-50 border-b border-orange-100 px-3 py-2 flex items-start gap-2 text-[10px] text-orange-900 leading-snug">
             <i class="ri-information-fill text-orange-500 shrink-0 mt-0.5"></i>
@@ -1367,53 +1471,99 @@
           </div>
 
           <!-- Step 2 -->
-          <div x-show="cartStep === 2" class="px-3 pt-3 space-y-3 text-sm">
-            <div x-show="rxPrescriptionComplete && selectedHasRx" class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs text-emerald-800">
-              问诊已完成 · 电子处方已开具（演示），可继续填写收货信息并支付。
+          <div x-show="cartStep === 2" class="bg-white text-sm">
+            <!-- 提示条 -->
+            <div class="px-3 py-2.5 text-[11px] leading-snug border-b border-slate-100 flex items-start gap-2">
+              <i class="ri-volume-up-line text-orange-500 mt-0.5"></i>
+              <p class="text-orange-600">
+                根据《药品网络销售监督管理办法》规定，处方药须凭处方，在药师指导下购买和使用。
+              </p>
             </div>
-            <div class="bg-white rounded-2xl border border-slate-100 p-4 space-y-2">
-              <p class="font-semibold">收货人</p>
-              <input type="text" x-model="order.receiver" placeholder="姓名" class="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-brand-500" />
-              <input type="tel" x-model="order.phone" placeholder="手机号" class="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-brand-500" />
-            </div>
-            <div class="bg-white rounded-2xl border border-slate-100 p-4 space-y-2">
-              <p class="font-semibold">收货地址</p>
-              <textarea x-model="order.address" rows="2" placeholder="省市区 + 详细地址" class="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-brand-500 resize-none"></textarea>
-            </div>
-            <div class="bg-white rounded-2xl border border-slate-100 p-4 flex justify-between">
-              <span class="text-slate-500">运费</span>
-              <span>快递 ¥0.00（包邮）</span>
-            </div>
-            <div class="bg-white rounded-2xl border border-slate-100 p-4 flex justify-between">
-              <span class="text-slate-500">商城补贴</span>
-              <span class="text-emerald-600">-¥<span x-text="subsidyTotal.toFixed(2)"></span></span>
-            </div>
-            <div class="bg-white rounded-2xl border border-slate-100 p-4 space-y-2" x-show="drugCardActivated && subsidyTotal > 0">
-              <button type="button" @click="showDiscountDetail = !showDiscountDetail" class="w-full flex items-center justify-between text-xs font-semibold text-brand-600">
-                <span>展开优惠明细</span>
-                <span x-text="showDiscountDetail ? '收起' : '查看'"></span>
-              </button>
-              <div x-show="showDiscountDetail" class="space-y-2 text-[11px] text-slate-600">
-                <template x-for="it in selectedDiscountItems" :key="it.id">
-                  <div class="flex items-center justify-between gap-3">
-                    <span class="truncate" x-text="it.name"></span>
-                    <span class="shrink-0">已优惠 ¥<span x-text="it.subsidyTotalUnit.toFixed(2)"></span></span>
+
+            <!-- 收货信息 -->
+            <button type="button" @click="openAddressPicker()" class="w-full px-3 py-3 border-b border-slate-100 flex items-center justify-between text-left">
+              <div class="min-w-0">
+                <div class="flex items-center justify-between gap-3">
+                  <p class="text-sm text-slate-900">
+                    <span class="text-slate-500">收货人：</span>
+                    <span class="font-semibold" x-text="order.receiver || '张三'"></span>
+                  </p>
+                  <p class="text-sm text-slate-900 shrink-0" x-text="maskPhone(order.phone || '')"></p>
+                </div>
+                <p class="text-sm text-slate-700 mt-2">
+                  <span class="text-slate-500">收货地址：</span>
+                  <span x-text="order.address || '请选择收货地址'"></span>
+                </p>
+              </div>
+              <i class="ri-arrow-right-s-line text-slate-300 text-xl shrink-0"></i>
+            </button>
+
+            <!-- 商品列表（确认订单） -->
+            <div class="border-b border-slate-100">
+              <template x-for="it in selectedItems" :key="'co-' + it.id">
+                <div class="px-3 py-3 flex gap-3">
+                  <div class="relative w-14 h-14 rounded-lg bg-slate-100 overflow-hidden shrink-0 flex items-center justify-center">
+                    <template x-if="it.thumb">
+                      <img :src="it.thumb" alt="" class="w-full h-full object-cover" />
+                    </template>
+                    <template x-if="!it.thumb">
+                      <i class="ri-image-line text-xl text-slate-400"></i>
+                    </template>
+                    <span x-show="it.type === 'drug' && (it.drugKind || 'otc') === 'rx'" class="absolute left-1 top-1 text-[8px] px-1 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">处方药</span>
+                    <span x-show="it.type === 'drug' && (it.drugKind || 'otc') !== 'rx'" class="absolute left-1 top-1 text-[8px] px-1 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">非处方</span>
                   </div>
-                </template>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm text-slate-900 line-clamp-2" x-text="it.name"></p>
+                    <p class="text-[11px] text-slate-400 mt-1" x-text="'规格:' + (it.spec || '-')"></p>
+                    <p class="text-red-600 font-bold mt-1">¥<span x-text="(it.type === 'drug' ? cartItemUnitPrice(it) : Number(it?.price ?? 0)).toFixed(2)"></span></p>
+                  </div>
+                  <div class="text-slate-500 text-sm shrink-0 self-center">x<span x-text="it.qty"></span></div>
+                </div>
+              </template>
+            </div>
+
+            <!-- 金额区域 -->
+            <div class="px-3">
+              <div class="flex items-center justify-between py-3 border-b border-slate-100">
+                <span class="text-slate-700">商品总金额</span>
+                <span class="text-slate-900">¥<span x-text="selectedTotal.toFixed(2)"></span></span>
+              </div>
+              <button type="button" class="w-full flex items-center justify-between py-3 border-b border-slate-100 text-left">
+                <span class="text-slate-700">运费</span>
+                <span class="text-slate-500 flex items-center gap-2">
+                  <span>快递 ¥0</span>
+                  <i class="ri-arrow-right-s-line text-slate-300 text-lg"></i>
+                </span>
+              </button>
+              <button type="button" class="w-full flex items-center justify-between py-3 border-b border-slate-100 text-left">
+                <span class="text-slate-700 flex items-center gap-2">
+                  商城补贴
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-orange-50 text-orange-600 border border-orange-200 font-semibold">商家补贴</span>
+                </span>
+                <span class="text-red-500">减 ¥<span x-text="subsidyTotal.toFixed(2)"></span></span>
+              </button>
+              <button type="button" class="w-full flex items-center justify-between py-3 border-b border-slate-100 text-left">
+                <span class="text-slate-700">优惠券</span>
+                <span class="text-slate-400">无可用优惠券</span>
+              </button>
+              <div class="flex items-center justify-end py-3 border-b border-slate-100">
+                <span class="text-slate-500 mr-2">合计：</span>
+                <span class="text-red-600 font-bold">¥<span x-text="payAmount.toFixed(2)"></span></span>
               </div>
             </div>
-            <div class="bg-white rounded-2xl border border-slate-100 p-4 flex justify-between items-center">
-              <span class="text-slate-500">优惠券</span>
-              <span class="text-brand-600">满减券 -¥5（演示）</span>
+
+            <!-- 发票/备注 -->
+            <button type="button" class="w-full px-3 py-3 border-b border-slate-100 flex items-center justify-between text-left">
+              <span class="text-slate-700">发票</span>
+              <span class="text-slate-400 flex items-center gap-1">本次不开具发票 <i class="ri-arrow-right-s-line text-slate-300 text-lg"></i></span>
+            </button>
+            <div class="px-3 py-3 border-b border-slate-100">
+              <div class="flex items-center gap-3">
+                <span class="text-slate-700 shrink-0">订单备注</span>
+                <input type="text" x-model="order.remark" placeholder="选填，可输入备注要求，最多50字" class="flex-1 text-sm outline-none placeholder:text-slate-300" maxlength="50" />
+              </div>
             </div>
-            <div class="bg-white rounded-2xl border border-slate-100 p-4 flex justify-between">
-              <span class="text-slate-500">发票</span>
-              <span>本次不开具发票</span>
-            </div>
-            <div class="bg-white rounded-2xl border border-slate-100 p-4">
-              <p class="text-slate-500 mb-2">订单备注</p>
-              <input type="text" x-model="order.remark" placeholder="选填" class="w-full rounded-xl border border-slate-200 px-3 py-2 outline-none" />
-            </div>
+            <div class="h-16"></div>
           </div>
 
           <!-- Step 3 -->
@@ -1431,7 +1581,8 @@
           </div>
 
           <!-- 购物车底部栏 -->
-          <div x-show="tab === 'cart'" class="fixed bottom-14 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 px-3 py-3 safe-pb shadow-[0_-4px_20px_rgba(0,0,0,0.06)] z-[61]">
+          <div x-show="tab === 'cart'" class="fixed bottom-14 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 safe-pb shadow-[0_-4px_20px_rgba(0,0,0,0.06)] z-[61]"
+               :class="cartStep === 2 ? 'px-0 py-0' : 'px-3 py-3'">
             <div x-show="cartStep === 1" class="flex items-center gap-3">
               <label class="flex items-center gap-2 text-sm shrink-0 text-slate-700">
                 <input type="checkbox" :checked="allChecked" @change="toggleAll($event.target.checked)" class="rounded-full border-slate-300 text-orange-500 w-5 h-5" />
@@ -1443,9 +1594,13 @@
               </div>
               <button type="button" @click="goCartStep2()" :disabled="selectedCount === 0" class="shrink-0 px-6 py-2.5 rounded-full bg-gradient-to-r from-orange-500 to-orange-400 text-white text-sm font-bold shadow-md disabled:opacity-40">下一步</button>
             </div>
-            <div x-show="cartStep === 2" class="flex items-center justify-between gap-3">
-              <p class="text-xs text-slate-600">共 <span x-text="selectedCount"></span> 件，合计：<span class="text-red-600 font-bold">¥<span x-text="selectedTotal.toFixed(2)"></span></span></p>
-              <button type="button" @click="cartStep = 3" class="px-5 py-2.5 rounded-xl bg-brand-600 text-white text-sm font-semibold">下一步</button>
+            <div x-show="cartStep === 2" class="flex items-stretch justify-between">
+              <div class="flex-1 px-3 py-3 text-xs text-slate-600 flex items-center">
+                <p>共<span class="mx-1" x-text="selectedCount"></span>件 合计：
+                  <span class="text-red-600 font-bold">¥<span x-text="payAmount.toFixed(2)"></span></span>
+                </p>
+              </div>
+              <button type="button" @click="createOrderAndOpenPay()" class="w-32 bg-orange-500 text-white text-sm font-semibold">下一步</button>
             </div>
             <div x-show="cartStep === 3" class="flex items-center justify-between gap-3">
               <p class="text-xs text-slate-600">待支付金额：<span class="text-red-600 font-bold text-base">¥<span x-text="payAmount.toFixed(2)"></span></span></p>
@@ -1494,7 +1649,7 @@
 
           <div class="px-3 -mt-6 space-y-3 relative z-10">
             <!-- 我的权益（福利卡横向权益入口） -->
-            <div class="bg-gradient-to-b from-[#FFF1E5] to-white rounded-2xl border border-orange-100/90 p-4 shadow-sm">
+            <div x-show="loggedIn" class="bg-gradient-to-b from-[#FFF1E5] to-white rounded-2xl border border-orange-100/90 p-4 shadow-sm">
               <p class="text-sm font-bold text-slate-900 mb-3">我的权益</p>
               <div class="flex gap-5 overflow-x-auto pb-1 -mx-0.5 px-0.5">
                 <template x-for="(b, bi) in myBenefits" :key="'ben-' + bi">
@@ -1575,11 +1730,11 @@
             <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
               <div class="flex items-center justify-between mb-3">
                 <p class="text-sm font-semibold">我的订单</p>
-                <button type="button" @click="openOrdersList('pending_payment')" class="text-xs text-slate-500 hover:text-slate-700">
+                <button type="button" @click="openOrdersList('all')" class="text-xs text-slate-500 hover:text-slate-700">
                   查看全部 <span class="text-slate-400">›</span>
                 </button>
               </div>
-              <div class="grid grid-cols-4 gap-2 text-center">
+              <div class="grid grid-cols-5 gap-2 text-center">
                 <button type="button" @click="openOrdersList('pending_payment')" class="rounded-xl py-3 border border-slate-100 hover:bg-slate-50">
                   <i class="ri-wallet-line text-lg text-brand-600"></i>
                   <p class="text-[10px] text-slate-600 mt-1">待付款</p>
@@ -1593,19 +1748,23 @@
                   <p class="text-[10px] text-slate-600 mt-1">待收货</p>
                 </button>
                 <button type="button" @click="openOrdersList('completed')" class="rounded-xl py-3 border border-slate-100 hover:bg-slate-50">
-                  <i class="ri-checkbox-circle-line text-lg text-brand-600"></i>
-                  <p class="text-[10px] text-slate-600 mt-1">已完成</p>
+                  <i class="ri-star-smile-line text-lg text-brand-600"></i>
+                  <p class="text-[10px] text-slate-600 mt-1">待评价</p>
+                </button>
+                <button type="button" @click="openOrdersList('aftersale')" class="rounded-xl py-3 border border-slate-100 hover:bg-slate-50">
+                  <i class="ri-arrow-go-back-line text-lg text-brand-600"></i>
+                  <p class="text-[10px] text-slate-600 mt-1">售后/退款</p>
                 </button>
               </div>
             </div>
 
             <!-- 常用功能 -->
             <div class="bg-white rounded-2xl border border-slate-100 shadow-sm divide-y divide-slate-100 text-sm overflow-hidden">
-              <button type="button" @click="toast('地址管理')" class="w-full flex justify-between items-center p-4 text-left">
+              <button type="button" @click="openAddressManage()" class="w-full flex justify-between items-center p-4 text-left">
                 <span class="flex items-center gap-2 text-slate-700"><i class="ri-map-pin-2-line text-lg text-slate-400"></i>地址管理</span>
                 <span class="text-slate-400">›</span>
               </button>
-              <button type="button" @click="toast('处方与问诊记录')" class="w-full flex justify-between items-center p-4 text-left">
+              <button type="button" @click="openConsultRecords()" class="w-full flex justify-between items-center p-4 text-left">
                 <span class="flex items-center gap-2 text-slate-700"><i class="ri-file-list-3-line text-lg text-slate-400"></i>处方与问诊记录</span>
                 <span class="text-slate-400">›</span>
               </button>
@@ -1615,6 +1774,226 @@
               </button>
             </div>
           </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- ========== 处方与问诊记录（二级） ========== -->
+    <template x-if="view === 'consultRecords'">
+      <div class="fixed inset-0 z-[58] bg-white max-w-md mx-auto left-0 right-0 flex flex-col">
+        <header class="shrink-0 flex items-center gap-2 px-3 py-3 bg-white border-b border-slate-100">
+          <button type="button" @click="closeConsultRecords()" class="p-2 -ml-1 rounded-xl text-slate-700 text-lg" aria-label="返回">×</button>
+          <h1 class="font-semibold text-base text-slate-900 flex-1 text-center pr-8">处方与问诊记录</h1>
+        </header>
+
+        <div class="flex-1 overflow-y-auto bg-[#f4f4f5] pb-24">
+          <div class="p-3 space-y-3">
+            <template x-for="r in consultRecords" :key="r.id">
+              <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+                  <p class="text-sm font-semibold text-slate-900">问诊购药</p>
+                  <p class="text-xs text-slate-400" x-text="r.statusText"></p>
+                </div>
+                <div class="px-4 py-3 text-xs text-slate-600 space-y-1">
+                  <p>开始时间：<span class="text-slate-800" x-text="r.startTime"></span></p>
+                  <p>结束时间：<span class="text-slate-800" x-text="r.endTime"></span></p>
+                  <p>问诊ID：<span class="text-slate-800" x-text="r.consultId"></span></p>
+                  <p x-show="r.diagnosis">拟诊：<span class="text-slate-800" x-text="r.diagnosis"></span></p>
+                </div>
+                <div class="px-4 pb-4 flex justify-end gap-2">
+                  <button type="button"
+                          x-show="r.hasRx"
+                          @click="openRxSheet(r.id)"
+                          class="px-4 py-2 rounded-full bg-teal-500/10 text-teal-700 text-xs font-semibold border border-teal-200">
+                    电子处方
+                  </button>
+                  <button type="button"
+                          @click="openConsultChat(r.id)"
+                          class="px-4 py-2 rounded-full bg-teal-500 text-white text-xs font-semibold shadow-sm">
+                    问诊记录
+                  </button>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- ========== 问诊记录（聊天） ========== -->
+    <template x-if="view === 'consultChat' && activeConsult">
+      <div class="fixed inset-0 z-[58] bg-white max-w-md mx-auto left-0 right-0 flex flex-col">
+        <header class="shrink-0 flex items-center gap-2 px-3 py-3 bg-white border-b border-slate-100">
+          <button type="button" @click="closeConsultChat()" class="p-2 -ml-1 rounded-xl text-slate-700 text-lg" aria-label="返回">←</button>
+          <div class="flex-1 text-center pr-8">
+            <p class="font-semibold text-base text-slate-900">问诊记录</p>
+            <p class="text-[10px] text-slate-400 -mt-0.5" x-text="activeConsult.meta || ''"></p>
+          </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto bg-[#f4f4f5] px-3 py-4 space-y-3">
+          <template x-for="(m, mi) in activeConsult.messages" :key="activeConsult.id + '-' + mi">
+            <div class="flex" :class="m.role === 'patient' ? 'justify-end' : 'justify-start'">
+              <div class="max-w-[80%] rounded-2xl px-3 py-2 text-sm leading-relaxed shadow-sm"
+                   :class="m.role === 'patient' ? 'bg-teal-500 text-white rounded-br-md' : 'bg-white text-slate-800 rounded-bl-md border border-slate-100'">
+                <p class="text-[10px] opacity-80 mb-1" x-text="m.time"></p>
+                <p class="whitespace-pre-wrap" x-text="m.text"></p>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </template>
+
+    <!-- ========== 处方笺弹层 ========== -->
+    <div x-show="rxSheetModal" x-transition.opacity class="fixed inset-0 z-[90] bg-black/60 flex items-center justify-center px-3 max-w-md mx-auto" @click.self="rxSheetModal = false">
+      <div class="bg-white rounded-2xl w-full overflow-hidden shadow-xl" @click.stop>
+        <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+          <p class="font-semibold text-slate-900">处方笺</p>
+          <button type="button" @click="rxSheetModal = false" class="p-2 -mr-2 rounded-xl text-slate-500">×</button>
+        </div>
+        <div class="p-4 bg-slate-50">
+          <div class="bg-white rounded-xl border border-slate-200 p-4 text-xs text-slate-700">
+            <p class="text-sm font-semibold text-center text-slate-900">互联网医院处方笺（演示）</p>
+            <div class="mt-3 grid grid-cols-2 gap-2">
+              <p>处方编号：<span class="font-medium" x-text="(activeRxSheet && activeRxSheet.rxNo) ? activeRxSheet.rxNo : '-'"></span></p>
+              <p>开具日期：<span class="font-medium" x-text="(activeRxSheet && activeRxSheet.rxDate) ? activeRxSheet.rxDate : '-'"></span></p>
+              <p>姓名：<span class="font-medium" x-text="(activeRxSheet && activeRxSheet.patient) ? activeRxSheet.patient : '-'"></span></p>
+              <p>性别/年龄：<span class="font-medium" x-text="(activeRxSheet && activeRxSheet.genderAge) ? activeRxSheet.genderAge : '-'"></span></p>
+            </div>
+            <div class="mt-3 pt-3 border-t border-slate-100">
+              <p class="font-semibold text-slate-900 mb-2">RP</p>
+              <template x-for="(l, li) in ((activeRxSheet && activeRxSheet.lines) ? activeRxSheet.lines : [])" :key="'rx-line-' + li">
+                <p class="text-slate-700 leading-relaxed" x-text="l"></p>
+              </template>
+            </div>
+            <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+              <span>医师：<span class="text-slate-700" x-text="(activeRxSheet && activeRxSheet.doctor) ? activeRxSheet.doctor : '-'"></span></span>
+              <span class="text-red-600 font-semibold">（电子签章示意）</span>
+            </div>
+          </div>
+          <p class="text-[10px] text-slate-400 mt-3 leading-relaxed">
+            注：处方为演示内容，用于展示交互与样式。
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 地址管理：空态 / 列表 ========== -->
+    <template x-if="view === 'addressManage'">
+      <div class="fixed inset-0 z-[58] bg-white max-w-md mx-auto left-0 right-0 flex flex-col">
+        <header class="shrink-0 flex items-center gap-2 px-3 py-3 bg-white border-b border-slate-100">
+          <button type="button" @click="closeAddressManage()" class="p-2 -ml-1 rounded-xl text-slate-700 text-lg" aria-label="返回">←</button>
+          <h1 class="font-semibold text-base text-slate-900 flex-1 text-center pr-8">收货地址</h1>
+        </header>
+
+        <div class="flex-1 overflow-y-auto">
+          <!-- 空态 -->
+          <template x-if="addresses.length === 0">
+            <div class="h-full flex flex-col items-center justify-center px-6 py-10 text-center">
+              <div class="w-56 h-56 rounded-3xl bg-slate-50 flex items-center justify-center">
+                <div class="w-28 h-20 rounded-2xl bg-gradient-to-br from-red-400 to-orange-400 relative shadow-md">
+                  <div class="absolute -top-6 left-1/2 -translate-x-1/2 w-14 h-14 rounded-2xl bg-white/85 flex items-center justify-center text-2xl text-orange-500">✈</div>
+                </div>
+              </div>
+              <p class="text-base font-semibold text-slate-800 mt-6">您还没有地址</p>
+              <p class="text-sm text-slate-500 mt-2">可以点击底部按钮新增地址</p>
+            </div>
+          </template>
+
+          <!-- 列表态 -->
+          <template x-if="addresses.length > 0">
+            <div class="bg-[#f4f4f5] min-h-full p-3 space-y-3">
+              <template x-for="a in addresses" :key="a.id">
+                <div class="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                      <p class="text-sm font-semibold text-slate-900">
+                        <span x-text="a.name"></span>
+                        <span class="ml-2 text-slate-600 font-normal" x-text="a.phone"></span>
+                      </p>
+                      <p class="text-xs text-slate-500 mt-2 leading-relaxed" x-text="a.region + a.detail"></p>
+                    </div>
+                    <div class="flex items-center gap-3 text-xs text-slate-500 shrink-0">
+                      <button type="button" @click="editAddress(a.id)" class="hover:text-slate-700">编辑</button>
+                      <button type="button" @click="deleteAddress(a.id)" class="hover:text-red-600">删除</button>
+                    </div>
+                  </div>
+                  <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <label class="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
+                      <input type="radio" name="defaultAddress" :checked="a.isDefault" @change="setDefaultAddress(a.id)" class="text-orange-500" />
+                      默认地址
+                    </label>
+                    <span class="text-[10px] text-slate-400" x-show="a.tag" x-text="a.tag"></span>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </template>
+        </div>
+
+        <div class="shrink-0 fixed bottom-14 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-100 px-4 py-3 safe-pb z-[61]">
+          <button type="button" @click="openAddressAdd()" class="w-full py-3.5 rounded-full bg-gradient-to-r from-red-500 to-orange-500 text-white text-sm font-semibold shadow-md">新增收货地址</button>
+        </div>
+      </div>
+    </template>
+
+    <!-- ========== 新增/编辑收货地址 ========== -->
+    <template x-if="view === 'addressEdit'">
+      <div class="fixed inset-0 z-[58] bg-[#f4f4f5] max-w-md mx-auto left-0 right-0 flex flex-col">
+        <header class="shrink-0 flex items-center gap-2 px-3 py-3 bg-white border-b border-slate-100">
+          <button type="button" @click="closeAddressEdit()" class="p-2 -ml-1 rounded-xl text-slate-700 text-lg" aria-label="返回">←</button>
+          <h1 class="font-semibold text-base text-slate-900 flex-1 text-center pr-8" x-text="addressEditId ? '编辑收货地址' : '新增收货地址'"></h1>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-3 pb-28 safe-pb">
+          <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+            <button type="button" @click="pickAddressRegion()" class="w-full flex items-center gap-3 px-4 py-4 border-b border-slate-100 text-left">
+              <span class="text-sm text-slate-700 w-20 shrink-0">收货地址</span>
+              <span class="flex-1 text-sm text-slate-400" x-text="addressForm.region || '点击选择收货地址'"></span>
+              <i class="ri-arrow-right-s-line text-slate-300 text-lg"></i>
+            </button>
+            <div class="flex items-center gap-3 px-4 py-4 border-b border-slate-100">
+              <span class="text-sm text-slate-700 w-20 shrink-0">详细地址</span>
+              <input type="text" x-model="addressForm.detail" placeholder="例如：A区8号楼1单元102" class="flex-1 text-sm outline-none placeholder:text-slate-300" />
+            </div>
+            <div class="flex items-center gap-3 px-4 py-4 border-b border-slate-100">
+              <span class="text-sm text-slate-700 w-20 shrink-0">标签</span>
+              <div class="flex gap-2">
+                <button type="button" @click="addressForm.tag='家'" class="px-4 py-1.5 rounded-full text-xs border" :class="addressForm.tag==='家' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-white text-slate-600 border-slate-200'">家</button>
+                <button type="button" @click="addressForm.tag='公司'" class="px-4 py-1.5 rounded-full text-xs border" :class="addressForm.tag==='公司' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-white text-slate-600 border-slate-200'">公司</button>
+                <button type="button" @click="addressForm.tag='学校'" class="px-4 py-1.5 rounded-full text-xs border" :class="addressForm.tag==='学校' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-white text-slate-600 border-slate-200'">学校</button>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 px-4 py-4 border-b border-slate-100">
+              <span class="text-sm text-slate-700 w-20 shrink-0">联系人</span>
+              <input type="text" x-model="addressForm.name" placeholder="请填写收货人的姓名" class="flex-1 text-sm outline-none placeholder:text-slate-300" />
+              <label class="flex items-center gap-1 text-xs text-slate-500">
+                <input type="radio" name="gender" value="先生" x-model="addressForm.gender" class="text-orange-500" />先生
+              </label>
+              <label class="flex items-center gap-1 text-xs text-slate-500">
+                <input type="radio" name="gender" value="女士" x-model="addressForm.gender" class="text-orange-500" />女士
+              </label>
+            </div>
+            <div class="flex items-center gap-3 px-4 py-4">
+              <span class="text-sm text-slate-700 w-20 shrink-0">手机号</span>
+              <input type="tel" x-model="addressForm.phone" placeholder="请填写收货人的手机号" class="flex-1 text-sm outline-none placeholder:text-slate-300" />
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-100 p-4 mt-3 flex items-center justify-between">
+            <div>
+              <p class="text-sm font-semibold text-slate-900">默认地址</p>
+              <p class="text-[10px] text-slate-400 mt-1">提醒：每次下单默认推荐使用该地址</p>
+            </div>
+            <button type="button" @click="addressForm.isDefault = !addressForm.isDefault" class="w-12 h-7 rounded-full relative transition" :class="addressForm.isDefault ? 'bg-orange-500' : 'bg-slate-200'">
+              <span class="absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition" :class="addressForm.isDefault ? 'left-5' : 'left-0.5'"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="shrink-0 fixed bottom-14 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-100 px-4 py-3 safe-pb z-[61]">
+          <button type="button" @click="saveAddress()" class="w-full py-3.5 rounded-full bg-gradient-to-r from-red-500 to-orange-500 text-white text-sm font-semibold shadow-md">保存地址</button>
         </div>
       </div>
     </template>
@@ -1831,7 +2210,7 @@
               </button>
             </div>
             <div class="flex-1 flex gap-2 min-w-0">
-              <button type="button" @click="addToCart(detailDrug)" class="flex-1 py-2.5 rounded-full bg-amber-400 text-white text-xs font-bold shadow-sm">加入购物车</button>
+              <button type="button" @click="openAddToCartSheet(detailDrug)" class="flex-1 py-2.5 rounded-full bg-amber-400 text-white text-xs font-bold shadow-sm">加入购物车</button>
               <button type="button" x-show="(detailDrug.drugKind || 'otc') === 'rx'" @click="buyRxFromDetail()" class="flex-1 py-2.5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold shadow-sm">开方购买</button>
               <button type="button" x-show="(detailDrug.drugKind || 'otc') !== 'rx'" @click="buyNowFromDetail()" class="flex-1 py-2.5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold shadow-sm">立即购买</button>
             </div>
@@ -1839,6 +2218,52 @@
         </div>
       </div>
     </template>
+
+    <!-- ========== 加入购物车：选择数量浮层（商品详情页） ========== -->
+    <div x-show="addToCartSheet" x-transition.opacity class="fixed inset-0 z-[88] bg-black/40 flex items-end justify-center max-w-md mx-auto" @click.self="closeAddToCartSheet()">
+      <div class="bg-white w-full rounded-t-3xl p-4 safe-pb" @click.stop>
+        <div class="flex items-start gap-3">
+          <div class="relative w-16 h-16 rounded-xl bg-slate-100 overflow-hidden shrink-0 flex items-center justify-center">
+            <template x-if="addToCartDrug && addToCartDrug.thumb">
+              <img :src="addToCartDrug.thumb" alt="" class="w-full h-full object-cover" />
+            </template>
+            <template x-if="!(addToCartDrug && addToCartDrug.thumb)">
+              <i class="ri-image-line text-2xl text-slate-400"></i>
+            </template>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-slate-900 line-clamp-2" x-text="addToCartDrug ? addToCartDrug.name : ''"></p>
+            <div class="mt-1">
+              <template x-if="addToCartDrug && addToCartDrug.type === 'drug'">
+                <template x-if="drugShowEquity">
+                  <p class="text-sm font-bold text-red-600">
+                    ¥<span x-text="drugEquityPrice(addToCartDrug).toFixed(2)"></span>
+                    <span class="text-[11px] text-red-600 font-semibold border border-red-100 bg-red-50 px-1.5 py-0.5 rounded ml-1">到手价</span>
+                  </p>
+                </template>
+              </template>
+              <template x-if="addToCartDrug && addToCartDrug.type === 'drug'">
+                <template x-if="!drugShowEquity">
+                  <p class="text-sm font-bold text-red-600">¥<span x-text="drugOriginalPrice(addToCartDrug).toFixed(2)"></span></p>
+                </template>
+              </template>
+            </div>
+          </div>
+          <button type="button" @click="closeAddToCartSheet()" class="p-2 -mt-2 -mr-2 rounded-xl text-slate-400">×</button>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+          <span class="text-sm text-slate-700">购买数量</span>
+          <div class="flex items-center border border-slate-200 rounded-full overflow-hidden text-sm">
+            <button type="button" @click="addToCartQty = Math.max(1, Number(addToCartQty || 1) - 1)" class="px-3 py-1.5 text-slate-600 bg-slate-50">−</button>
+            <span class="px-4 w-12 text-center font-medium" x-text="addToCartQty"></span>
+            <button type="button" @click="addToCartQty = Math.min(99, Number(addToCartQty || 1) + 1)" class="px-3 py-1.5 text-slate-600 bg-slate-50">+</button>
+          </div>
+        </div>
+
+        <button type="button" @click="confirmAddToCartSheet()" class="w-full mt-5 py-3.5 rounded-full bg-gradient-to-r from-orange-500 to-orange-400 text-white text-sm font-semibold shadow-md">确认加入购物车</button>
+      </div>
+    </div>
 
     <!-- 组合包详情 -->
     <template x-if="detailPage === 'combo' && detailCombo">
@@ -1914,6 +2339,122 @@
     <div x-show="toastMsg" x-text="toastMsg" class="fixed left-1/2 -translate-x-1/2 bottom-28 z-[80] px-4 py-2 rounded-full bg-slate-800 text-white text-sm shadow-lg max-w-[85%] text-center" x-transition.opacity></div>
   </div>
 
+  <!-- ========== 确认订单：选择收货地址弹层 ========== -->
+  <div x-show="addressPickerSheet" x-transition.opacity class="fixed inset-0 z-[89] bg-black/40 flex items-end justify-center max-w-md mx-auto" @click.self="addressPickerSheet = false">
+    <div class="bg-white w-full rounded-t-3xl p-4 safe-pb" @click.stop>
+      <div class="flex items-center justify-between">
+        <p class="font-semibold text-slate-900">选择收货地址</p>
+        <button type="button" @click="addressPickerSheet = false" class="p-2 -mr-2 rounded-xl text-slate-400">×</button>
+      </div>
+      <div class="mt-3 space-y-2">
+        <template x-if="addresses.length === 0">
+          <div class="text-center text-sm text-slate-400 py-10">暂无收货地址</div>
+        </template>
+        <template x-for="a in addresses" :key="'pick-' + a.id">
+          <button type="button" @click="pickAddressForOrder(a.id)" class="w-full text-left rounded-2xl border px-4 py-4 flex items-center justify-between"
+                  :class="(orderAddressId === a.id) ? 'border-orange-300 ring-1 ring-orange-200' : 'border-slate-100'">
+            <div class="min-w-0">
+              <p class="text-sm text-slate-900">
+                <span class="font-semibold" x-text="a.name"></span>
+                <span class="ml-2 text-slate-600" x-text="maskPhone(a.phone)"></span>
+              </p>
+              <p class="text-xs text-slate-500 mt-2 line-clamp-2" x-text="(a.region || '') + (a.detail || '')"></p>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+              <button type="button" @click.stop="editAddress(a.id)" class="text-xs text-slate-500">编辑</button>
+              <i class="ri-checkbox-circle-fill text-xl" :class="(orderAddressId === a.id) ? 'text-orange-500' : 'text-slate-200'"></i>
+            </div>
+          </button>
+        </template>
+      </div>
+      <button type="button" @click="openAddressAdd(); addressPickerSheet = false" class="w-full mt-4 py-3.5 rounded-full bg-gradient-to-r from-orange-500 to-orange-400 text-white text-sm font-semibold shadow-md">+ 新增收货地址</button>
+    </div>
+  </div>
+
+  <!-- ========== 选择支付方式浮层（仅微信） ========== -->
+  <div x-show="showPayMethodSheet" x-transition.opacity class="fixed inset-0 z-[92] bg-black/40 flex items-end justify-center max-w-md mx-auto" @click.self="showPayMethodSheet = false">
+    <div class="bg-white w-full rounded-t-3xl p-4 safe-pb" @click.stop>
+      <div class="flex items-center justify-between">
+        <p class="font-semibold text-slate-900">选择支付方式</p>
+        <button type="button" @click="showPayMethodSheet = false" class="p-2 -mr-2 rounded-xl text-slate-400">×</button>
+      </div>
+      <div class="mt-3 bg-white rounded-2xl border border-slate-100 overflow-hidden">
+        <label class="flex items-center justify-between gap-3 p-4 cursor-pointer">
+          <div class="flex items-center gap-2">
+            <i class="ri-wechat-pay-line text-xl text-emerald-600"></i>
+            <span class="text-sm text-slate-800">微信支付</span>
+          </div>
+          <input type="radio" name="paySheet" value="wx" x-model="payMethod" class="text-brand-600" />
+        </label>
+      </div>
+      <div class="mt-3 bg-slate-50 rounded-2xl p-4 text-sm">
+        <p>应付金额：<span class="text-red-600 font-bold text-lg">¥<span x-text="payAmount.toFixed(2)"></span></span></p>
+      </div>
+      <button type="button" @click="confirmWxPay()" class="w-full mt-4 py-3.5 rounded-full bg-gradient-to-r from-brand-600 to-brand-500 text-white text-sm font-semibold shadow-md">确认支付</button>
+    </div>
+  </div>
+
+  <!-- ========== 微信收银台（演示样式） ========== -->
+  <div x-show="wxCashierSheet" x-transition.opacity class="fixed inset-0 z-[95] bg-black/40 flex items-end justify-center max-w-md mx-auto" @click.self="closeWxCashier()">
+    <div class="bg-white w-full rounded-t-3xl overflow-hidden safe-pb" @click.stop>
+      <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+        <p class="font-semibold text-slate-900">支付</p>
+        <button type="button" @click="closeWxCashier()" class="p-2 -mr-2 rounded-xl text-slate-500">×</button>
+      </div>
+
+      <div class="px-5 pt-5 pb-3 text-center">
+        <p class="text-[12px] text-lime-600 font-semibold" x-text="wxMerchantName"></p>
+        <p class="mt-3 text-3xl font-bold text-slate-900">¥<span x-text="wxPayAmount.toFixed(2)"></span></p>
+      </div>
+
+      <div class="px-4">
+        <div class="h-px bg-slate-100"></div>
+        <div class="flex items-center justify-between py-3 text-sm">
+          <span class="text-slate-500">付款方式</span>
+          <button type="button" class="text-slate-400 flex items-center gap-1">更改 <i class="ri-arrow-down-s-line"></i></button>
+        </div>
+        <div class="rounded-2xl border border-slate-100 bg-[#FFF7ED] px-4 py-3 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="w-5 h-5 rounded-full bg-orange-500/15 text-orange-600 flex items-center justify-center text-xs font-bold">¥</span>
+            <div class="text-left">
+              <p class="text-sm text-slate-800">宁波银行信用卡</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">**** **** **** 3057</p>
+            </div>
+          </div>
+          <i class="ri-check-line text-emerald-600 text-xl"></i>
+        </div>
+
+        <div class="mt-4 grid grid-cols-6 gap-2 px-1">
+          <template x-for="i in 6" :key="'pwd-' + i">
+            <div class="h-11 rounded-lg border border-slate-200 bg-white flex items-center justify-center">
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-900" x-show="wxPayPwd.length >= i"></span>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <!-- 数字键盘 -->
+      <div class="mt-5 bg-slate-50 border-t border-slate-100">
+        <div class="grid grid-cols-3 text-center text-xl font-semibold text-slate-800">
+          <button type="button" @click="wxPayInput('1')" class="py-5 border-r border-b border-slate-200 bg-white active:bg-slate-100">1</button>
+          <button type="button" @click="wxPayInput('2')" class="py-5 border-r border-b border-slate-200 bg-white active:bg-slate-100">2</button>
+          <button type="button" @click="wxPayInput('3')" class="py-5 border-b border-slate-200 bg-white active:bg-slate-100">3</button>
+          <button type="button" @click="wxPayInput('4')" class="py-5 border-r border-b border-slate-200 bg-white active:bg-slate-100">4</button>
+          <button type="button" @click="wxPayInput('5')" class="py-5 border-r border-b border-slate-200 bg-white active:bg-slate-100">5</button>
+          <button type="button" @click="wxPayInput('6')" class="py-5 border-b border-slate-200 bg-white active:bg-slate-100">6</button>
+          <button type="button" @click="wxPayInput('7')" class="py-5 border-r border-b border-slate-200 bg-white active:bg-slate-100">7</button>
+          <button type="button" @click="wxPayInput('8')" class="py-5 border-r border-b border-slate-200 bg-white active:bg-slate-100">8</button>
+          <button type="button" @click="wxPayInput('9')" class="py-5 border-b border-slate-200 bg-white active:bg-slate-100">9</button>
+          <button type="button" class="py-5 border-r border-slate-200 bg-slate-50"></button>
+          <button type="button" @click="wxPayInput('0')" class="py-5 border-r border-slate-200 bg-white active:bg-slate-100">0</button>
+          <button type="button" @click="wxPayBackspace()" class="py-5 bg-slate-50 text-slate-700 active:bg-slate-100">
+            <i class="ri-delete-back-2-line"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     function mallApp() {
       return {
@@ -1950,6 +2491,13 @@
         remoteConsultStep: 1,
         orderDetailBackTo: 'ordersList',
         showPayMethodSheet: false,
+        addressPickerSheet: false,
+        orderAddressId: '',
+        wxCashierSheet: false,
+        wxMerchantName: '江苏中心药房XXX公司',
+        wxPayAmount: 0,
+        wxPayPwd: '',
+        lastCreatedOrderId: '',
         showRxPrescriptionDetail: false,
         showCancelOrderModal: false,
         showDeleteOrderConfirm: false,
@@ -1995,7 +2543,112 @@
         })(),
         showDiscountDetail: false,
         order: { receiver: '', phone: '', address: '', remark: '' },
-        ordersStatus: 'pending_payment',
+        addresses: (() => {
+          try {
+            const raw = window.localStorage?.getItem('mall_addresses') || '';
+            const arr = raw ? JSON.parse(raw) : [];
+            if (!Array.isArray(arr)) return [];
+            const cleaned = arr
+              .filter(x => x && typeof x === 'object')
+              .map(x => ({
+                id: String(x.id || ('a_' + Math.random().toString(16).slice(2))),
+                name: String(x.name || ''),
+                gender: String(x.gender || ''),
+                phone: String(x.phone || ''),
+                region: String(x.region || ''),
+                detail: String(x.detail || ''),
+                tag: String(x.tag || ''),
+                isDefault: !!x.isDefault
+              }));
+            if (cleaned.length && !cleaned.some(x => x.isDefault)) cleaned[0].isDefault = true;
+            return cleaned;
+          } catch (e) {
+            return [];
+          }
+        })(),
+        addressEditId: '',
+        addressForm: { region: '', detail: '', tag: '家', name: '', gender: '先生', phone: '', isDefault: false },
+        consultRecords: [
+          {
+            id: 'c1',
+            statusText: '超时停止',
+            startTime: '2026-04-04 17:33:53',
+            endTime: '2026-04-04 18:04:04',
+            consultId: '51693675342927232',
+            diagnosis: '',
+            hasRx: false,
+            meta: 'mzx.jushimzb.com',
+            messages: [
+              { role: 'doctor', time: '2026-04-04 17:33:55', text: '欢迎来到我的诊室。' },
+              { role: 'patient', time: '2026-04-04 17:34:10', text: '【患者】张三，25岁，男\n【是否在医院就诊】是\n【是否孕期或哺乳期】否\n【肝肾功能是否正常】是\n【是否有过敏史】否\n【症状】头痛、流涕\n【持续时间】2周' },
+              { role: 'patient', time: '2026-04-04 17:34:12', text: '医生您好，以上是我的信息。' },
+              { role: 'doctor', time: '2026-04-04 17:34:21', text: '请问还有其他需要补充的症状吗？' }
+            ]
+          },
+          {
+            id: 'c2',
+            statusText: '超时停止',
+            startTime: '2026-04-04 16:45:12',
+            endTime: '2026-04-04 17:16:04',
+            consultId: '51693483877275008',
+            diagnosis: '上呼吸道感染；消化不良',
+            hasRx: true,
+            meta: 'mzx.jushimzb.com',
+            rx: {
+              rxNo: '51356535570030008',
+              rxDate: '2026-04-04',
+              patient: '张三',
+              genderAge: '男 / 35岁',
+              doctor: '楚瑞红',
+              lines: [
+                '1) 阿莫西林胶囊 0.25g*50s ×2 盒',
+                '2) 蒲地蓝消炎口服液 ×2 盒',
+                '3) 健胃消食片 ×1 盒',
+                '4) 双歧杆菌四联活菌片 0.5g*12s ×1 盒'
+              ]
+            },
+            messages: [
+              { role: 'doctor', time: '2026-04-04 16:45:12', text: '欢迎来到我的诊室。' },
+              { role: 'patient', time: '2026-04-04 16:45:12', text: '【患者】张三，25岁，男\n【是否在医院就诊】是\n【是否孕期或哺乳期】否\n【肝肾功能是否正常】是\n【是否有过敏史】否\n【症状】头痛、流涕\n【持续时间】2周' },
+              { role: 'patient', time: '2026-04-04 16:45:12', text: '医生您好，以上是我的信息。' },
+              { role: 'doctor', time: '2026-04-04 16:45:21', text: '请问还有其他需要补充的症状吗？' },
+              { role: 'patient', time: '2026-04-04 16:58:21', text: '医生我想买 阿莫西林胶囊0.25g*50s 两盒；蒲地蓝消炎口服液*2 健胃消食片1盒 感冒灵颗粒1盒 双歧杆菌四联活菌片0.5g*12s 1盒' }
+            ]
+          },
+          {
+            id: 'c3',
+            statusText: '已停止',
+            startTime: '2025-11-17 11:25:19',
+            endTime: '2025-11-17 11:56:03',
+            consultId: '50910827225092736',
+            diagnosis: '消化不良；急性上呼吸道感染',
+            hasRx: true,
+            meta: 'mzx.jushimzb.com',
+            rx: {
+              rxNo: '50910827225092736',
+              rxDate: '2025-11-17',
+              patient: '张三',
+              genderAge: '男 / 35岁',
+              doctor: '医生A',
+              lines: [
+                '1) 感冒灵颗粒 10g×9袋 ×1 盒',
+                '2) 健胃消食片 ×1 盒'
+              ]
+            },
+            messages: [
+              { role: 'doctor', time: '2025-11-17 11:25:20', text: '您好，请描述一下症状。' },
+              { role: 'patient', time: '2025-11-17 11:26:05', text: '流涕、头痛，胃也不太舒服。' },
+              { role: 'doctor', time: '2025-11-17 11:28:12', text: '我这边给您开具处方并建议多休息、多饮水。' }
+            ]
+          }
+        ],
+        activeConsult: null,
+        rxSheetModal: false,
+        activeRxSheet: null,
+        addToCartSheet: false,
+        addToCartDrug: null,
+        addToCartQty: 1,
+        ordersStatus: 'all',
         orders: [
           {
             id: 'o1',
@@ -2100,6 +2753,8 @@
         activeOrder: null,
         comboActiveBundle: null,
         activeTopicSection: null,
+        topicSubKey: '',
+        categoryActive: '推荐',
         shortcutDrugTitle: '',
         shortcutDrugKey: '',
         searchKeyword: '',
@@ -2213,57 +2868,200 @@
         categories8: [
           { name: '推荐', icon: 'ri-star-smile-line' },
           { name: '感冒发烧', icon: 'ri-mental-health-line' },
-          { name: '家庭常备', icon: 'ri-medicine-bottle-line' },
-          { name: '咳嗽咽痛', icon: 'ri-lungs-line' },
-          { name: '儿童用药', icon: 'ri-bear-smile-line' },
-          { name: '皮肤用药', icon: 'ri-drop-line' },
-          { name: '原研好药', icon: 'ri-award-line' },
-          { name: '自营药房', icon: 'ri-store-2-line' }
+          { name: '原研药', icon: 'ri-award-line' },
+          { name: '处方药', icon: 'ri-file-list-2-line' },
+          { name: '慢病用药', icon: 'ri-heart-pulse-line' },
+          { name: '营养保健', icon: 'ri-leaf-line' },
+          { name: '生活专区', icon: 'ri-home-8-line' },
+          { name: '成人计生', icon: 'ri-user-heart-line' }
         ],
         topicSections: [
           {
-            id: 'subsidy',
-            title: '百亿补贴',
-            cardClass: 'bg-gradient-to-b from-red-500 to-red-600 border-red-300',
-            titleClass: 'text-white',
-            items: [
-              { name: '喷雾防晒', thumb: './thumbnails/cold-pudilan.png', subsidy: '69.1元', price: '29.9', drugKind: 'otc', highlight: true },
-              { name: '身体乳', thumb: './thumbnails/child-yikexin.png', subsidy: '9.6元', price: '67.9', drugKind: 'otc', highlight: true }
-            ]
-          },
-          {
-            id: 'hot',
+            id: 'zone-hot',
             title: '热卖榜单',
+            subtitle: '覆盖多科室用药场景 · 榜单实时更新（演示）',
+            bannerBg: 'bg-gradient-to-r from-orange-500 to-red-500',
+            bannerThumb: './thumbnails/cold-pudilan.png',
+            intro: '严选平台热卖好药，覆盖日常感冒、儿科、心脑血管等多场景（演示）。',
+            discountPower: '药诊卡权益 7 折起',
+            promo: '榜单热卖｜补贴直降',
             cardClass: 'bg-white border-slate-100',
-            titleClass: 'text-slate-800',
+            titleClass: 'text-slate-900',
+            subTabs: [
+              { key: 'all', name: '综合热卖榜' },
+              { key: 'cold', name: '感冒用药热卖榜' },
+              { key: 'peds', name: '儿科用药热卖榜' },
+              { key: 'cardio', name: '心脑血管热卖榜' },
+              { key: 'male', name: '男科用药热卖榜' },
+              { key: 'gyn', name: '妇科用药热卖榜' },
+              { key: 'neuro', name: '神经系统用药热卖榜' }
+            ],
+            sections: [
+              { key: 'all', title: '综合热卖榜', desc: '日常生活常用到的热卖好药（演示）' },
+              { key: 'cold', title: '感冒用药热卖榜', desc: '日常感冒发热常备推荐（演示）' },
+              { key: 'peds', title: '儿科用药热卖榜', desc: '儿童常用与家庭守护（演示）' },
+              { key: 'cardio', title: '心脑血管热卖榜', desc: '慢病日常管理常备（演示）' },
+              { key: 'male', title: '男科用药热卖榜', desc: '男科常用药品推荐（演示）' },
+              { key: 'gyn', title: '妇科用药热卖榜', desc: '妇科常用药品推荐（演示）' },
+              { key: 'neuro', title: '神经系统用药热卖榜', desc: '神经系统用药推荐（演示）' }
+            ],
             items: [
-              { name: '蒲地蓝消炎片', thumb: './thumbnails/cold-pudilan.png', subsidy: '11.2元', price: '4.8', drugKind: 'otc', highlight: false },
-              { name: '纯牛奶', thumb: './thumbnails/cold-ganma.png', subsidy: '25.9元', price: '29.9', drugKind: 'otc', highlight: true }
-            ]
+              { drugId: 'c1', name: '【方盛】蒲地蓝消炎片54片喉咙痛清热...', thumb: './thumbnails/cold-pudilan.png', drugKind: 'otc', originalPrice: 16.0 },
+              { drugId: 'c3', name: '【百灵鸟】维C银翘片24片感冒咳嗽感冒⋯', thumb: './thumbnails/cold-yinqiao.png', drugKind: 'otc', originalPrice: 17.4 }
+            ],
+            itemsBySubKey: {
+              all: [
+                { drugId: 'c1', name: '【方盛】蒲地蓝消炎片54片喉咙痛清热...', thumb: './thumbnails/cold-pudilan.png', drugKind: 'otc', originalPrice: 16.0 },
+                { drugId: 'c3', name: '【百灵鸟】维C银翘片24片感冒咳嗽感冒⋯', thumb: './thumbnails/cold-yinqiao.png', drugKind: 'otc', originalPrice: 17.4 },
+                { drugId: 'c2', name: '【999】感冒灵颗粒10g9袋头痛发热鼻...', thumb: './thumbnails/cold-ganma.png', drugKind: 'rx', originalPrice: 34.3 },
+                { drugId: 'rx-cefaclor', name: '【仁和】头孢克洛分散片0.25g*8片', thumb: './thumbnails/cold-yinqiao.png', drugKind: 'rx', originalPrice: 15.8 },
+                { drugId: 'k1', name: '【江中】乳酸菌素片36片养出益生菌大...', thumb: './thumbnails/child-rulact.png', drugKind: 'otc', originalPrice: 15.2 },
+                { drugId: 'k3', name: '【江中】健胃消食片36片肚子胀消化不…', thumb: './thumbnails/child-jianwei.png', drugKind: 'otc', originalPrice: 25.2 }
+              ],
+              cold: [
+                { drugId: 'c3', name: '【百灵鸟】维C银翘片24片感冒咳嗽感冒⋯', thumb: './thumbnails/cold-yinqiao.png', drugKind: 'otc', originalPrice: 17.4 },
+                { drugId: 'c2', name: '【999】感冒灵颗粒10g9袋头痛发热鼻...', thumb: './thumbnails/cold-ganma.png', drugKind: 'rx', originalPrice: 34.3 },
+                { drugId: 'c1', name: '【方盛】蒲地蓝消炎片54片喉咙痛清热...', thumb: './thumbnails/cold-pudilan.png', drugKind: 'otc', originalPrice: 16.0 },
+                { drugId: 'rx-cefaclor', name: '【仁和】头孢克洛分散片0.25g*8片', thumb: './thumbnails/cold-yinqiao.png', drugKind: 'rx', originalPrice: 15.8 },
+                { drugId: 'k3', name: '【江中】健胃消食片36片肚子胀消化不…', thumb: './thumbnails/child-jianwei.png', drugKind: 'otc', originalPrice: 25.2 },
+                { drugId: 'k1', name: '【江中】乳酸菌素片36片养出益生菌大...', thumb: './thumbnails/child-rulact.png', drugKind: 'otc', originalPrice: 15.2 }
+              ],
+              peds: [
+                { drugId: 'k2', name: '【伊可新】维生素AD滴剂（胶囊型）10s3⋯', thumb: './thumbnails/child-yikexin.png', drugKind: 'otc', originalPrice: 55.0 },
+                { drugId: 'k1', name: '【江中】乳酸菌素片36片养出益生菌大...', thumb: './thumbnails/child-rulact.png', drugKind: 'otc', originalPrice: 15.2 },
+                { drugId: 'k3', name: '【江中】健胃消食片36片肚子胀消化不…', thumb: './thumbnails/child-jianwei.png', drugKind: 'otc', originalPrice: 25.2 },
+                { drugId: 'c3', name: '【百灵鸟】维C银翘片24片感冒咳嗽感冒⋯', thumb: './thumbnails/cold-yinqiao.png', drugKind: 'otc', originalPrice: 17.4 },
+                { drugId: 'c1', name: '【方盛】蒲地蓝消炎片54片喉咙痛清热...', thumb: './thumbnails/cold-pudilan.png', drugKind: 'otc', originalPrice: 16.0 },
+                { drugId: 'c2', name: '【999】感冒灵颗粒10g9袋头痛发热鼻...', thumb: './thumbnails/cold-ganma.png', drugKind: 'rx', originalPrice: 34.3 }
+              ],
+              cardio: [
+                { drugId: 'rx-cefaclor', name: '【处方药】心脑血管用药A（示意）', thumb: './thumbnails/cold-yinqiao.png', drugKind: 'rx', originalPrice: 88.0 },
+                { drugId: 'k2', name: '鱼油软胶囊（示意）', thumb: './thumbnails/child-yikexin.png', drugKind: 'otc', originalPrice: 129.0 },
+                { drugId: 'k3', name: '叶黄素（示意）', thumb: './thumbnails/child-jianwei.png', drugKind: 'otc', originalPrice: 29.0 },
+                { drugId: 'c1', name: '【方盛】蒲地蓝消炎片54片喉咙痛清热...', thumb: './thumbnails/cold-pudilan.png', drugKind: 'otc', originalPrice: 16.0 },
+                { drugId: 'k1', name: '【江中】乳酸菌素片36片养出益生菌大...', thumb: './thumbnails/child-rulact.png', drugKind: 'otc', originalPrice: 15.2 },
+                { drugId: 'c2', name: '【处方药】慢病用药B（示意）', thumb: './thumbnails/cold-ganma.png', drugKind: 'rx', originalPrice: 99.0 }
+              ],
+              male: [
+                { drugId: 'c2', name: '男科用药A（示意）', thumb: './thumbnails/cold-ganma.png', drugKind: 'rx', originalPrice: 69.0 },
+                { drugId: 'rx-cefaclor', name: '男科用药B（示意）', thumb: './thumbnails/cold-yinqiao.png', drugKind: 'rx', originalPrice: 99.0 },
+                { drugId: 'k1', name: '营养补充（示意）', thumb: './thumbnails/child-rulact.png', drugKind: 'otc', originalPrice: 39.0 },
+                { drugId: 'k2', name: '维生素补充（示意）', thumb: './thumbnails/child-yikexin.png', drugKind: 'otc', originalPrice: 29.9 },
+                { drugId: 'c1', name: '消炎常备（示意）', thumb: './thumbnails/cold-pudilan.png', drugKind: 'otc', originalPrice: 16.0 },
+                { drugId: 'c3', name: '咽喉常备（示意）', thumb: './thumbnails/cold-yinqiao.png', drugKind: 'otc', originalPrice: 17.4 }
+              ],
+              gyn: [
+                { drugId: 'rx-cefaclor', name: '妇科用药A（示意）', thumb: './thumbnails/child-jianwei.png', drugKind: 'rx', originalPrice: 79.0 },
+                { drugId: 'c2', name: '妇科用药B（示意）', thumb: './thumbnails/child-rulact.png', drugKind: 'rx', originalPrice: 109.0 },
+                { drugId: 'k2', name: '滋补调理（示意）', thumb: './thumbnails/child-yikexin.png', drugKind: 'otc', originalPrice: 59.0 },
+                { drugId: 'k1', name: '益生菌调理（示意）', thumb: './thumbnails/child-rulact.png', drugKind: 'otc', originalPrice: 39.0 },
+                { drugId: 'c1', name: '家庭常备（示意）', thumb: './thumbnails/cold-pudilan.png', drugKind: 'otc', originalPrice: 16.0 },
+                { drugId: 'c3', name: '清热解毒（示意）', thumb: './thumbnails/cold-yinqiao.png', drugKind: 'otc', originalPrice: 17.4 }
+              ],
+              neuro: [
+                { drugId: 'c2', name: '神经系统用药A（示意）', thumb: './thumbnails/cold-yinqiao.png', drugKind: 'rx', originalPrice: 119.0 },
+                { drugId: 'rx-cefaclor', name: '神经系统用药B（示意）', thumb: './thumbnails/cold-ganma.png', drugKind: 'rx', originalPrice: 139.0 },
+                { drugId: 'k2', name: '营养保健（示意）', thumb: './thumbnails/child-yikexin.png', drugKind: 'otc', originalPrice: 59.0 },
+                { drugId: 'k3', name: '肠胃调理（示意）', thumb: './thumbnails/child-jianwei.png', drugKind: 'otc', originalPrice: 25.2 },
+                { drugId: 'k1', name: '益生菌（示意）', thumb: './thumbnails/child-rulact.png', drugKind: 'otc', originalPrice: 15.2 },
+                { drugId: 'c1', name: '消炎常备（示意）', thumb: './thumbnails/cold-pudilan.png', drugKind: 'otc', originalPrice: 16.0 }
+              ]
+            }
           },
           {
-            id: 'medicine-plan',
-            title: '国民药品保障计划',
-            cardClass: 'bg-[#eef8f2] border-[#d6ebdf]',
-            titleClass: 'text-slate-800',
+            id: 'zone-family',
+            title: '家庭常备',
+            cardClass: 'bg-white border-slate-100',
+            titleClass: 'text-slate-900',
+            subTabs: [
+              { key: 'family', name: '家庭小药箱' },
+              { key: 'child', name: '儿童小药箱' },
+              { key: 'car', name: '车载小药箱' },
+              { key: 'elder', name: '老人专用药箱' },
+              { key: 'waterfall', name: '常用药瀑布流' }
+            ],
             items: [
-              { name: '开塞露', thumb: './thumbnails/child-rulact.png', subsidy: '0元', price: '1', drugKind: 'otc', highlight: false },
-              { name: '珍珠明目滴眼液', thumb: './thumbnails/child-jianwei.png', subsidy: '2.3元', price: '1', drugKind: 'otc', highlight: false },
-              { name: '桂林西瓜霜含片', thumb: './thumbnails/cold-yinqiao.png', subsidy: '7.5元', price: '3.2', drugKind: 'otc', highlight: false },
-              { name: '家中常备', thumb: './thumbnails/cold-ganma.png', subsidy: '33.1元', price: '5.9', drugKind: 'rx', highlight: false },
-              { name: '创口贴', thumb: './thumbnails/cold-pudilan.png', subsidy: '5元', price: '15', drugKind: 'otc', highlight: false },
-              { name: '食欲不振消化不良', thumb: './thumbnails/child-rulact.png', subsidy: '22元', price: '7.9', drugKind: 'otc', highlight: false }
-            ]
+              { name: '布洛芬缓释胶囊', thumb: './thumbnails/cold-ganma.png', drugKind: 'otc', originalPrice: 17.4, salePrice: 10.8, subsidyAmount: 6.6 },
+              { name: '乳酸菌素片', thumb: './thumbnails/child-rulact.png', drugKind: 'otc', originalPrice: 15.2, salePrice: 7.6, subsidyAmount: 7.6 }
+            ],
+            itemsBySubKey: {
+              family: [
+                { name: '布洛芬缓释胶囊', thumb: './thumbnails/cold-ganma.png', drugKind: 'otc', originalPrice: 17.4, salePrice: 10.8, subsidyAmount: 6.6 },
+                { name: '桂林西瓜霜含片', thumb: './thumbnails/child-jianwei.png', drugKind: 'otc', originalPrice: 10.7, salePrice: 3.2, subsidyAmount: 7.5 },
+                { name: '创口贴（示意）', thumb: './thumbnails/cold-pudilan.png', drugKind: 'otc', originalPrice: 15.0, salePrice: 5.9, subsidyAmount: 9.1 }
+              ],
+              child: [
+                { name: '维生素AD滴剂', thumb: './thumbnails/child-yikexin.png', drugKind: 'otc', originalPrice: 55.0, salePrice: 33.0, subsidyAmount: 22.0 },
+                { name: '乳酸菌素片', thumb: './thumbnails/child-rulact.png', drugKind: 'otc', originalPrice: 15.2, salePrice: 7.6, subsidyAmount: 7.6 }
+              ],
+              car: [
+                { name: '车载消毒湿巾（示意）', thumb: './thumbnails/cold-yinqiao.png', drugKind: 'otc', originalPrice: 29.9, salePrice: 19.9, subsidyAmount: 10.0 },
+                { name: '止痛贴（示意）', thumb: './thumbnails/child-yikexin.png', drugKind: 'otc', originalPrice: 23.0, salePrice: 9.9, subsidyAmount: 13.1 }
+              ],
+              elder: [
+                { name: '氨糖软骨素贴', thumb: './thumbnails/child-rulact.png', drugKind: 'otc', originalPrice: 33.0, salePrice: 9.9, subsidyAmount: 23.1 },
+                { name: '叶黄素（示意）', thumb: './thumbnails/child-yikexin.png', drugKind: 'otc', originalPrice: 29.0, salePrice: 7.9, subsidyAmount: 21.1 }
+              ],
+              waterfall: [
+                { name: '常用药A（示意）', thumb: './thumbnails/cold-ganma.png', drugKind: 'otc', originalPrice: 19.9, salePrice: 5.9, subsidyAmount: 14.0 },
+                { name: '常用药B（示意）', thumb: './thumbnails/cold-pudilan.png', drugKind: 'otc', originalPrice: 25.9, salePrice: 7.9, subsidyAmount: 18.0 },
+                { name: '常用药C（示意）', thumb: './thumbnails/cold-yinqiao.png', drugKind: 'otc', originalPrice: 17.4, salePrice: 4.2, subsidyAmount: 13.2 },
+                { name: '常用药D（示意）', thumb: './thumbnails/child-jianwei.png', drugKind: 'otc', originalPrice: 39.0, salePrice: 11.9, subsidyAmount: 27.1 }
+              ]
+            }
           },
           {
-            id: 'nutrition-plan',
-            title: '国民营养保障计划',
-            cardClass: 'bg-[#f7f2e6] border-[#ece3cf]',
-            titleClass: 'text-slate-800',
+            id: 'zone-brand',
+            title: '品牌特卖',
+            cardClass: 'bg-white border-slate-100',
+            titleClass: 'text-slate-900',
+            subTabs: [
+              { key: '999', name: '三九专区' },
+              { key: 'jiangzhong', name: '江中专区' },
+              { key: 'shuanghe', name: '双鹤专区' }
+            ],
             items: [
-              { name: '奥运冠军推荐', thumb: './thumbnails/child-yikexin.png', subsidy: '40元', price: '29', drugKind: 'otc', highlight: false },
-              { name: '智能体脂秤', thumb: './thumbnails/cold-yinqiao.png', subsidy: '10元', price: '49.9', drugKind: 'otc', highlight: false }
-            ]
+              { name: '【999】感冒灵颗粒', thumb: './thumbnails/cold-ganma.png', drugKind: 'rx', originalPrice: 34.3, salePrice: 9.9, subsidyAmount: 24.4 },
+              { name: '【江中】健胃消食片', thumb: './thumbnails/child-jianwei.png', drugKind: 'otc', originalPrice: 25.2, salePrice: 8.4, subsidyAmount: 16.8 }
+            ],
+            itemsBySubKey: {
+              999: [
+                { name: '【999】感冒灵颗粒', thumb: './thumbnails/cold-ganma.png', drugKind: 'rx', originalPrice: 34.3, salePrice: 9.9, subsidyAmount: 24.4 },
+                { name: '【999】小儿感冒药（示意）', thumb: './thumbnails/child-yikexin.png', drugKind: 'otc', originalPrice: 29.9, salePrice: 12.9, subsidyAmount: 17.0 }
+              ],
+              jiangzhong: [
+                { name: '【江中】乳酸菌素片', thumb: './thumbnails/child-rulact.png', drugKind: 'otc', originalPrice: 15.2, salePrice: 7.6, subsidyAmount: 7.6 },
+                { name: '【江中】健胃消食片', thumb: './thumbnails/child-jianwei.png', drugKind: 'otc', originalPrice: 25.2, salePrice: 8.4, subsidyAmount: 16.8 }
+              ],
+              shuanghe: [
+                { name: '【双鹤】常用药A（示意）', thumb: './thumbnails/cold-yinqiao.png', drugKind: 'rx', originalPrice: 59.0, salePrice: 41.3, subsidyAmount: 17.7 },
+                { name: '【双鹤】常用药B（示意）', thumb: './thumbnails/cold-pudilan.png', drugKind: 'otc', originalPrice: 39.0, salePrice: 27.3, subsidyAmount: 11.7 }
+              ]
+            }
+          },
+          {
+            id: 'zone-cr',
+            title: '华润专区',
+            cardClass: 'bg-gradient-to-b from-emerald-50 to-white border-emerald-100',
+            titleClass: 'text-emerald-900',
+            subTabs: [
+              { key: 'ejiao', name: '东阿阿胶' },
+              { key: 'gaofang', name: '膏方' }
+            ],
+            items: [
+              { name: '东阿阿胶（示意）', thumb: './thumbnails/child-yikexin.png', drugKind: 'otc', originalPrice: 299.0, salePrice: 239.2, subsidyAmount: 59.8 },
+              { name: '膏方调理（示意）', thumb: './thumbnails/cold-yinqiao.png', drugKind: 'otc', originalPrice: 199.0, salePrice: 159.2, subsidyAmount: 39.8 }
+            ],
+            itemsBySubKey: {
+              ejiao: [
+                { name: '东阿阿胶（示意）', thumb: './thumbnails/child-yikexin.png', drugKind: 'otc', originalPrice: 299.0, salePrice: 239.2, subsidyAmount: 59.8 },
+                { name: '阿胶糕（示意）', thumb: './thumbnails/cold-pudilan.png', drugKind: 'otc', originalPrice: 189.0, salePrice: 151.2, subsidyAmount: 37.8 }
+              ],
+              gaofang: [
+                { name: '膏方调理（示意）', thumb: './thumbnails/cold-yinqiao.png', drugKind: 'otc', originalPrice: 199.0, salePrice: 159.2, subsidyAmount: 39.8 },
+                { name: '滋补膏方（示意）', thumb: './thumbnails/cold-ganma.png', drugKind: 'otc', originalPrice: 169.0, salePrice: 135.2, subsidyAmount: 33.8 }
+              ]
+            }
           }
         ],
         drugsCold: [
@@ -2366,6 +3164,320 @@
           this.tab = 'profile';
           this.cartStep = 1;
         },
+
+        persistAddresses() {
+          try {
+            window.localStorage?.setItem('mall_addresses', JSON.stringify(this.addresses || []));
+          } catch (e) {}
+        },
+        maskPhone(p) {
+          const s = String(p || '').trim();
+          if (!/^1\d{10}$/.test(s)) return s || '';
+          return s.slice(0, 3) + '****' + s.slice(-4);
+        },
+        syncOrderWithDefaultAddress() {
+          const d = (this.addresses || []).find(x => x.isDefault);
+          if (!d) return;
+          this.orderAddressId = d.id;
+          this.order.receiver = d.name || this.order.receiver;
+          this.order.phone = d.phone || this.order.phone;
+          const addr = (d.region || '') + (d.detail || '');
+          this.order.address = addr || this.order.address;
+        },
+        openAddressPicker() {
+          if (!this.orderAddressId) this.syncOrderWithDefaultAddress();
+          this.addressPickerSheet = true;
+        },
+        pickAddressForOrder(id) {
+          const a = (this.addresses || []).find(x => x.id === id);
+          if (!a) return;
+          this.orderAddressId = id;
+          this.order.receiver = a.name || '';
+          this.order.phone = a.phone || '';
+          this.order.address = (a.region || '') + (a.detail || '');
+          this.addressPickerSheet = false;
+        },
+        openAddressManage() {
+          this.view = 'addressManage';
+        },
+        closeAddressManage() {
+          this.view = 'main';
+          this.tab = 'profile';
+        },
+        resetAddressForm() {
+          this.addressEditId = '';
+          const demoRegion = '北京市 北京市 西城区 滨河路';
+          const demoDetail = 'A区8号楼1单元102';
+          const demoName = '张三';
+          const demoPhone = (this.loggedIn && /^1\d{10}$/.test(String(this.loginPhone || '').trim())) ? String(this.loginPhone).trim() : '13958565585';
+          this.addressForm = {
+            region: demoRegion,
+            detail: demoDetail,
+            tag: '家',
+            name: demoName,
+            gender: '先生',
+            phone: demoPhone,
+            isDefault: (this.addresses || []).length === 0
+          };
+        },
+        pickAddressRegion() {
+          // 演示：点击一次填入示例省市区
+          if (!this.addressForm) this.resetAddressForm();
+          if (!String(this.addressForm.region || '').trim()) {
+            this.addressForm.region = '北京市 北京市 西城区 滨河路';
+            this.toast('已选择收货地址（演示）');
+            return;
+          }
+          this.toast('已选择：' + this.addressForm.region);
+        },
+        openAddressAdd() {
+          this.resetAddressForm();
+          this.view = 'addressEdit';
+        },
+        closeAddressEdit() {
+          this.view = 'addressManage';
+        },
+
+        openConsultRecords() {
+          this.view = 'consultRecords';
+        },
+        closeConsultRecords() {
+          this.view = 'main';
+          this.tab = 'profile';
+        },
+        openConsultChat(id) {
+          const r = (this.consultRecords || []).find(x => x.id === id);
+          if (!r) return;
+          this.activeConsult = r;
+          this.view = 'consultChat';
+        },
+        closeConsultChat() {
+          this.view = 'consultRecords';
+          this.activeConsult = null;
+        },
+        openRxSheet(id) {
+          const r = (this.consultRecords || []).find(x => x.id === id);
+          if (!r || !r.rx) {
+            this.toast('暂无处方');
+            return;
+          }
+          this.activeRxSheet = r.rx;
+          this.rxSheetModal = true;
+        },
+
+        openAddToCartSheet(d) {
+          // 未登录的药品加购走原有登录拦截
+          if (d && d.type === 'drug' && !this.loggedIn) {
+            this.addToCart(d);
+            return;
+          }
+          this.addToCartDrug = d ? { ...d } : null;
+          this.addToCartQty = 1;
+          this.addToCartSheet = true;
+        },
+        closeAddToCartSheet() {
+          this.addToCartSheet = false;
+          this.addToCartDrug = null;
+          this.addToCartQty = 1;
+        },
+        confirmAddToCartSheet() {
+          const d = this.addToCartDrug;
+          const qty = Math.max(1, Math.min(99, Number(this.addToCartQty || 1)));
+          if (!d) { this.closeAddToCartSheet(); return; }
+
+          // 药品：一次性写入 qty（避免循环 addToCart）
+          if (d && d.type === 'drug') {
+            const conflicts = d.rxConflictWithIds || [];
+            for (let j = 0; j < conflicts.length; j++) {
+              const oid = conflicts[j];
+              const other = this.cartItems.find(i => i.id === oid);
+              if (other) {
+                this.toast('您加购的「' + d.name + '」与您购物车内「' + other.name + '」不宜同时使用哦~');
+                return;
+              }
+            }
+            const basePrice = Number(d.price || 0);
+            const unit = this.drugCardActivated ? basePrice * this.equityDiscount : basePrice;
+            const saving = this.drugCardActivated ? basePrice * (1 - this.equityDiscount) : 0;
+            const ex = this.cartItems.find(i => i.id === d.id);
+            if (ex) {
+              ex.qty = Number(ex.qty || 0) + qty;
+              ex.type = 'drug';
+              ex.basePrice = Number(ex.basePrice ?? basePrice);
+              ex.price = unit;
+              ex.subsidy = saving;
+            } else {
+              this.cartItems.push({ ...d, type: 'drug', basePrice, qty, checked: true, price: unit, subsidy: saving });
+            }
+            this.toast('已加入购物车');
+            this.closeAddToCartSheet();
+            return;
+          }
+
+          // 非药品（兜底）
+          const ex = this.cartItems.find(i => i.id === d.id);
+          if (ex) ex.qty = Number(ex.qty || 0) + qty;
+          else this.cartItems.push({ ...d, qty, checked: true });
+          this.toast('已加入购物车');
+          this.closeAddToCartSheet();
+        },
+
+        createOrderAndOpenPay() {
+          // 确认订单（全非处方药时的快捷流程）
+          if (this.selectedHasRx && !this.rxPrescriptionComplete) {
+            this.rxCheckoutStep = 1;
+            this.rxAgreementChecked = true;
+            this.view = 'rxCheckout';
+            this.toast('请先完善问诊处方信息');
+            return;
+          }
+          if (!this.order.address || !String(this.order.address).trim()) {
+            this.openAddressPicker();
+            this.toast('请选择收货地址');
+            return;
+          }
+          if (!this.order.phone || !/^1\d{10}$/.test(String(this.order.phone).trim())) {
+            this.toast('请填写正确手机号');
+            return;
+          }
+          const items = (this.cartItems || []).filter(i => i.checked);
+          if (!items.length) return;
+          const orderNo = 'HY' + String(new Date().getFullYear()) + String(Date.now()).slice(-9);
+          const now = new Date();
+          const ts = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0') +
+            ' ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+          const amount = Number(this.payAmount || this.selectedTotal || 0);
+          this.orders.unshift({
+            id: 'o-' + Date.now(),
+            orderNo,
+            createTime: ts,
+            status: 'pending_payment',
+            hasRx: this.selectedHasRx,
+            amount,
+            receiver: this.order.receiver || '张三',
+            address: this.order.address,
+            shippingText: '快递配送 · 待支付后发货',
+            firstItemName: items[0]?.name || '',
+            items: items.map(x => ({
+              name: x.name,
+              spec: x.spec || '',
+              qty: Number(x.qty || 1),
+              unitPrice: Number(x.type === 'drug' ? (x.basePrice ?? x.price ?? 0) : (x.price ?? 0)),
+              subtotal: Number((x.type === 'drug' ? (x.price ?? 0) : (x.price ?? 0))) * Number(x.qty || 1)
+            }))
+          });
+          this.lastCreatedOrderId = this.orders[0]?.id || '';
+          this.showPayMethodSheet = true;
+        },
+        confirmWxPay() {
+          this.payMethod = 'wx';
+          this.showPayMethodSheet = false;
+          this.wxPayAmount = Number(this.payAmount || 0);
+          this.wxPayPwd = '';
+          this.wxCashierSheet = true;
+        },
+        closeWxCashier() {
+          this.wxCashierSheet = false;
+          this.wxPayPwd = '';
+        },
+        wxPayInput(n) {
+          if (!this.wxCashierSheet) return;
+          const s = String(n || '');
+          if (!/^\d$/.test(s)) return;
+          if ((this.wxPayPwd || '').length >= 6) return;
+          this.wxPayPwd = String(this.wxPayPwd || '') + s;
+          if (this.wxPayPwd.length >= 6) {
+            // 支付成功（演示）：更新订单为已支付
+            const id = this.lastCreatedOrderId;
+            const o = id ? (this.orders || []).find(x => x.id === id) : null;
+            if (o) {
+              o.status = 'paid';
+              o.shippingText = '支付完成 · 正在配货（演示）';
+            }
+            this.toast('支付成功（演示）');
+            this.closeWxCashier();
+            this.cartItems = this.cartItems.filter(i => !i.checked);
+            this.cartStep = 1;
+            if (o) {
+              this.activeOrder = o;
+              this.orderDetailBackTo = 'main';
+              this.view = 'orderDetail';
+            }
+          }
+        },
+        wxPayBackspace() {
+          const s = String(this.wxPayPwd || '');
+          this.wxPayPwd = s.slice(0, -1);
+        },
+        editAddress(id) {
+          const a = (this.addresses || []).find(x => x.id === id);
+          if (!a) return;
+          this.addressEditId = id;
+          this.addressForm = {
+            region: a.region || '',
+            detail: a.detail || '',
+            tag: a.tag || '',
+            name: a.name || '',
+            gender: a.gender || '先生',
+            phone: a.phone || '',
+            isDefault: !!a.isDefault
+          };
+          this.view = 'addressEdit';
+        },
+        setDefaultAddress(id) {
+          this.addresses = (this.addresses || []).map(x => ({ ...x, isDefault: x.id === id }));
+          this.persistAddresses();
+          this.syncOrderWithDefaultAddress();
+        },
+        deleteAddress(id) {
+          const before = (this.addresses || []).slice();
+          const removed = before.find(x => x.id === id);
+          this.addresses = before.filter(x => x.id !== id);
+          if (removed && removed.isDefault && this.addresses.length) {
+            this.addresses[0].isDefault = true;
+          }
+          this.persistAddresses();
+          this.syncOrderWithDefaultAddress();
+          this.toast('已删除');
+        },
+        saveAddress() {
+          const f = this.addressForm || {};
+          const name = String(f.name || '').trim();
+          const phone = String(f.phone || '').trim();
+          const region = String(f.region || '').trim();
+          const detail = String(f.detail || '').trim();
+          if (!region) { this.toast('请选择收货地址'); return; }
+          if (!detail) { this.toast('请填写详细地址'); return; }
+          if (!name) { this.toast('请填写联系人'); return; }
+          if (!/^1\d{10}$/.test(phone)) { this.toast('请输入正确手机号'); return; }
+          const payload = {
+            id: this.addressEditId || ('a_' + Date.now()),
+            name,
+            gender: String(f.gender || ''),
+            phone,
+            region,
+            detail,
+            tag: String(f.tag || ''),
+            isDefault: !!f.isDefault
+          };
+          let next = (this.addresses || []).slice();
+          if (this.addressEditId) {
+            next = next.map(x => (x.id === this.addressEditId ? { ...x, ...payload } : x));
+          } else {
+            next.unshift(payload);
+          }
+          // 确保默认地址唯一
+          if (payload.isDefault) {
+            next = next.map(x => ({ ...x, isDefault: x.id === payload.id }));
+          } else if (!next.some(x => x.isDefault)) {
+            next[0].isDefault = true;
+          }
+          this.addresses = next;
+          this.persistAddresses();
+          this.syncOrderWithDefaultAddress();
+          this.toast('已保存');
+          this.view = 'addressManage';
+        },
         get comboSelectAllChecked() {
           return this.comboSelectItems.length > 0 && this.comboSelectItems.every(i => i.selected);
         },
@@ -2391,26 +3503,50 @@
         },
         onCategoryShortcut(c) {
           if (c.name === '推荐') {
-            this.view = 'recommendList';
+            this.openCategoryPage('推荐');
             return;
           }
           if (c.name === '感冒发烧') {
-            this.shortcutDrugTitle = '感冒用药';
-            this.shortcutDrugKey = 'cold';
-            this.view = 'shortcutDrugList';
-            return;
-          }
-          if (c.name === '儿童用药') {
-            this.shortcutDrugTitle = '儿童用药';
-            this.shortcutDrugKey = 'child';
-            this.view = 'shortcutDrugList';
-            return;
-          }
-          if (c.name === '家庭常备') {
-            this.view = 'familyReserve';
+            this.openCategoryPage('感冒发烧');
             return;
           }
           this.toast(c.name + '（演示）');
+        },
+        openCategoryPage(name) {
+          this.categoryActive = name || '推荐';
+          this.view = 'categoryPage';
+        },
+        closeCategoryPage() {
+          this.view = 'main';
+          this.tab = 'home';
+        },
+        selectCategory(name) {
+          this.categoryActive = name;
+        },
+        get categoryItems() {
+          if (this.categoryActive === '感冒发烧') return this.drugsCold;
+          if (this.categoryActive === '推荐') return this.recommendDrugs;
+          // 其它类目：先复用推荐列表（演示）
+          return this.recommendDrugs;
+        },
+        cartQtyById(id) {
+          const it = this.cartItems.find(x => x.id === id);
+          return it ? Number(it.qty || 0) : 0;
+        },
+        incCategoryItem(d) {
+          this.addToCart(d);
+        },
+        decCategoryItem(d) {
+          const ex = this.cartItems.find(x => x.id === d.id);
+          if (!ex) return;
+          ex.qty = Math.max(0, Number(ex.qty || 0) - 1);
+          if (ex.qty <= 0) this.cartItems = this.cartItems.filter(x => x.id !== d.id);
+        },
+        get categoryCartTotal() {
+          return this.cartItems.reduce((s, item) => {
+            const unit = item && item.type === 'drug' ? this.cartItemUnitPrice(item) : Number(item?.price ?? 0);
+            return s + unit * (Number(item?.qty) || 0);
+          }, 0);
         },
         closeShortcutDrugList() {
           this.shortcutDrugTitle = '';
@@ -2425,6 +3561,23 @@
         openTopicSection(topic) {
           this.activeTopicSection = topic;
           this.view = 'topicList';
+        },
+        topicSectionItems(topic, key) {
+          const t = topic || this.activeTopicSection;
+          if (!t) return [];
+          const map = t.itemsBySubKey || {};
+          if (key && Array.isArray(map[key])) return map[key];
+          return Array.isArray(t.items) ? t.items : [];
+        },
+        topicItemsForActive() {
+          const t = this.activeTopicSection;
+          if (!t) return [];
+          if (Array.isArray(t.subTabs) && t.subTabs.length) {
+            const k = this.topicSubKey || t.subTabs[0].key;
+            const map = t.itemsBySubKey || {};
+            return Array.isArray(map[k]) ? map[k] : (t.items || []);
+          }
+          return t.items || [];
         },
         closeTopicSection() {
           this.activeTopicSection = null;
@@ -2448,7 +3601,7 @@
           return this.drugOriginalPrice(d) * (1 - this.equityDiscount);
         },
         topicItemOriginal(it) {
-          return Number(it?.price || 0);
+          return Number(it?.originalPrice ?? it?.price ?? it?.salePrice ?? 0);
         },
         topicItemEquity(it) {
           return this.topicItemOriginal(it) * this.equityDiscount;
@@ -2457,13 +3610,16 @@
           return this.topicItemOriginal(it) * (1 - this.equityDiscount);
         },
         topicItemAsDrug(it) {
+          const original = this.topicItemOriginal(it);
+          const byId = it && it.drugId ? this.findCatalogDrug(it.drugId) : null;
+          if (byId) return { ...byId };
           return {
-            id: 'topic-view-' + it.name + '-' + String(it.price),
+            id: 'topic-view-' + it.name + '-' + String(original),
             type: 'drug',
             drugKind: it.drugKind || 'otc',
             name: it.name,
             thumb: it.thumb,
-            price: this.topicItemOriginal(it),
+            price: original,
             effect: '',
             usage: '',
             expiry: '24个月',
@@ -2554,7 +3710,7 @@
             this.toast('请先登录查看订单');
             return;
           }
-          this.ordersStatus = status;
+          this.ordersStatus = status || 'all';
           this.activeOrder = null;
           this.view = 'ordersList';
           this.tab = 'profile';
@@ -2665,7 +3821,10 @@
           return { txt: '已完成', cls: 'bg-slate-50 text-slate-700 border border-slate-200' };
         },
         get filteredOrders() {
-          return this.orders.filter(o => o.status === this.ordersStatus);
+          const s = this.ordersStatus || 'all';
+          if (s === 'all') return this.orders.slice();
+          if (s === 'aftersale') return this.orders.filter(o => o.status === 'closed');
+          return this.orders.filter(o => o.status === s);
         },
         payOrder(orderId) {
           const o = this.orders.find(x => x.id === orderId);
@@ -3034,9 +4193,10 @@
         },
         openRxAddPatient(from) {
           this.rxAddPatientFrom = from || 'checkout';
-          this.rxNewName = '';
-          this.rxNewIdCard = '';
-          this.rxNewPhone = '';
+          const first = Array.isArray(this.rxPatients) && this.rxPatients.length ? this.rxPatients[0] : null;
+          this.rxNewName = String(first?.name || '张三');
+          this.rxNewIdCard = String(first?.idCard || '110101199001011234');
+          this.rxNewPhone = String(first?.phone || (this.loggedIn ? this.loginPhone : '') || '13958016230');
           this.rxNewHealth = '无过往病史、无过敏史、无肝功异常';
           this.view = 'rxAddPatient';
         },
@@ -3067,6 +4227,7 @@
           this.view = 'main';
           this.tab = 'cart';
           this.cartStep = 2;
+          this.syncOrderWithDefaultAddress();
           this.rxCheckoutStep = 1;
           this.toast('问诊完成，请填写收货地址');
         },
@@ -3128,6 +4289,7 @@
             return;
           }
           this.cartStep = 2;
+          this.syncOrderWithDefaultAddress();
         },
         completePay() {
           this.toast('支付成功（演示）');
