@@ -245,7 +245,7 @@
                     <div class="leading-tight" x-show="loggedIn">
                       <p class="text-red-600 font-bold text-sm">¥<span x-text="drugOriginalPrice(d).toFixed(2)"></span><span class="text-[10px] ml-0.5">原价</span></p>
                       <p class="mt-1" x-show="isEquityDeductible(d)">
-                        <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded">权益卡</span>
+                        <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded">权益</span>
                         <span class="text-[10px] text-slate-400 ml-1">可抵扣</span>
                       </p>
                     </div>
@@ -292,7 +292,7 @@
 
           <div class="flex-1"></div>
 
-          <button type="button" @click="openCardActivatePage()" class="w-full mb-3 py-3 rounded-2xl border border-[#07C160]/30 text-[#07C160] font-medium text-sm">我有药诊卡，去激活</button>
+          <button type="button" @click="openCardActivatePage()" class="w-full mb-3 py-3 rounded-2xl border border-[#07C160]/30 text-[#07C160] font-medium text-sm">我有药惠通，去激活</button>
 
           <label class="flex items-start gap-2 pb-8 safe-pb cursor-pointer">
             <input type="checkbox" x-model="loginAgree" class="mt-0.5 rounded border-slate-300 text-[#07C160] focus:ring-[#07C160]" />
@@ -652,49 +652,124 @@
       </div>
     </div>
 
-    <!-- ========== 药诊优享卡：介绍 + 激活 ========== -->
+    <!-- ========== 权益激活 ========== -->
     <template x-if="view === 'cardActivate'">
       <div class="fixed inset-0 z-[60] bg-[#fff8f5] flex flex-col max-w-md mx-auto left-0 right-0 overflow-y-auto"
-           x-init="activatePhone = /^1\d{10}$/.test(String(loginPhone || '').trim()) ? String(loginPhone).trim() : (String(activatePhone || '').length === 11 ? activatePhone : ''); activateCode = '123456'; cardAgree = false">
+           x-init="initEquityActivatePage && initEquityActivatePage()">
         <header class="sticky top-0 z-10 flex items-center justify-between px-3 py-2.5 bg-gradient-to-b from-red-600 to-red-500 text-white">
           <button type="button" @click="closeCardPage()" class="p-2 rounded-xl text-white/90 hover:bg-white/10">✕</button>
-          <span class="text-sm font-medium opacity-90">药诊优享卡</span>
-          <span class="w-9"></span>
+          <span class="text-sm font-medium opacity-90">权益激活</span>
+          <button type="button"
+                  @click="view='main'; tab='home'"
+                  class="w-9 h-9 rounded-xl text-white/95 hover:bg-white/10 flex items-center justify-center"
+                  aria-label="返回首页">
+            <i class="ri-home-5-line text-lg"></i>
+          </button>
         </header>
 
-        <!-- Hero：直接使用提供的卡片图 -->
+        <!-- Hero -->
         <div class="px-3">
-          <div class="rounded-2xl overflow-hidden bg-white shadow-sm h-[420px]">
-            <img src="./card-activate-banner.png" alt="药诊优享卡" class="w-full h-full object-cover object-top" />
+          <div class="rounded-2xl overflow-hidden bg-white shadow-sm">
+            <div class="px-4 pt-4 pb-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
+              <p class="text-lg font-black tracking-wide">药惠通</p>
+              <p class="text-xs opacity-90 mt-1">专属健康权益激活</p>
+            </div>
+            <div class="p-4 bg-white">
+              <div class="flex items-center justify-between">
+                <p class="text-[11px] text-slate-500" x-show="loggedIn">当前账号：<span class="font-semibold" x-text="userMask || ''"></span></p>
+              </div>
+              <!-- 说明文案按需隐藏 -->
+            </div>
           </div>
         </div>
 
         <div class="px-3 mt-3 relative z-[1] space-y-3 pb-44 safe-pb">
-          <!-- 未激活：手机号 + 激活码 -->
-          <div x-show="!cardActivatePageSuccess" class="rounded-2xl bg-white border-2 border-orange-200 shadow-lg p-4">
-            <p class="text-center text-red-600 font-bold text-sm mb-4">◆ 完善信息，激活权益 ◆</p>
-            <div class="space-y-3">
-              <div>
-                <label class="text-xs text-slate-500">手机号</label>
-                <input type="tel" maxlength="11" x-model="activatePhone" placeholder="请输入手机号码" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-base outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400" />
-              </div>
-              <div>
-                <label class="text-xs text-slate-500">激活码</label>
-                <input type="text" x-model="activateCode" readonly tabindex="-1" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-base outline-none bg-slate-50 text-slate-600" />
-              </div>
-              <label class="flex items-start gap-2 text-[11px] text-slate-600 cursor-pointer">
-                <input type="checkbox" x-model="cardAgree" class="mt-0.5 rounded border-slate-300 text-orange-500 focus:ring-orange-400" />
-                <span>我已阅读并同意 <a href="#" class="text-blue-600" @click.prevent>《隐私政策》</a> <a href="#" class="text-blue-600" @click.prevent>《用户服务须知》</a></span>
-              </label>
-              <p class="text-[10px] text-slate-400">演示：输入11位手机号，并勾选协议即可激活。</p>
+          <!-- 已登录：展示已绑定权益卡状态 + 添加新权益 -->
+          <div x-show="loggedIn" class="rounded-2xl bg-white border border-slate-100 shadow-sm p-4">
+            <div class="flex items-center justify-between">
+              <p class="text-sm font-bold text-slate-900">已绑定权益卡</p>
+              <button type="button" class="text-xs text-slate-600 hover:text-slate-800" @click="openMyEquities && openMyEquities()">
+                <span x-text="(equityCards && equityCards.length > 0) ? ('查看全部（' + equityCards.length + '）') : '查看全部'"></span><span class="text-slate-400 ml-0.5">›</span>
+              </button>
             </div>
+            <div class="mt-3" x-show="equityCards && equityCards.length">
+              <div class="rounded-2xl bg-slate-900 text-white px-4 py-3 flex items-center justify-between">
+                <div class="min-w-0">
+                  <p class="text-sm font-black truncate" x-text="(activeEquityCard && activeEquityCard.name) ? activeEquityCard.name : '药惠通权益卡'"></p>
+                  <p class="text-[11px] text-white/80 mt-1 truncate" x-text="(activeEquityCard && activeEquityCard.holderName) ? ('姓名 ' + activeEquityCard.holderName) : ''"></p>
+                </div>
+                <div class="text-right shrink-0">
+                  <p class="text-[11px] text-white/85">已省：<span class="font-bold" x-text="activeEquityCard && (activeEquityCard.savedAmount != null) ? Number(activeEquityCard.savedAmount).toFixed(2) : '0.00'"></span>元</p>
+                  <p class="text-[11px] text-white/70 mt-1" x-text="activeEquityCard && activeEquityCard.expireAt ? ('有效期至' + activeEquityCard.expireAt) : ''"></p>
+                </div>
+              </div>
+            </div>
+            <div class="mt-3" x-show="!(equityCards && equityCards.length)">
+              <p class="text-xs text-slate-500">当前账号暂无已激活权益卡，可在下方添加并激活新的权益。</p>
+            </div>
+            <button type="button" class="mt-3 w-full py-2.5 rounded-2xl border border-emerald-200 bg-emerald-50 text-emerald-700 text-sm font-bold" @click="scrollEquityActivateForm && scrollEquityActivateForm()">
+              添加并激活新的权益
+            </button>
           </div>
 
-          <!-- 已激活：本页展示生效态（购药享权益价由 drugCardActivated 驱动） -->
-          <div x-show="cardActivatePageSuccess" x-cloak class="rounded-2xl bg-gradient-to-b from-emerald-50 to-white border-2 border-emerald-200 shadow-lg p-4 text-center">
-            <div class="w-14 h-14 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl mb-3">✓</div>
-            <p class="text-lg font-bold text-slate-900">权益已激活</p>
-            <p class="text-xs text-slate-500 mt-1" x-text="String(activatePhone||'').length===11 ? ('绑定手机 ' + String(activatePhone).slice(0,3) + '****' + String(activatePhone).slice(-4)) : ''"></p>
+          <!-- 表单：未登录完整版 / 已登录精简版 -->
+          <div id="equity-activate-form"
+               x-show="!loggedIn || !(equityCards && equityCards.length) || equityActivateFormOpen"
+               x-cloak
+               class="rounded-2xl bg-white border-2 border-orange-200 shadow-lg p-4">
+            <p class="text-center text-red-600 font-bold text-sm mb-4">◆ 实名卡密激活 ◆</p>
+            <div class="space-y-3">
+              <div>
+                <label class="text-xs text-slate-500">卡号</label>
+                <input type="text" x-model="equityFormCardNo" placeholder="请输入卡号" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-base outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400" />
+              </div>
+              <div>
+                <label class="text-xs text-slate-500">卡密</label>
+                <input type="password" x-model="equityFormCardPwd" placeholder="请输入卡密" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-base outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400" />
+              </div>
+              <div>
+                <label class="text-xs text-slate-500">姓名</label>
+                <input type="text" x-model="equityFormHolderName" placeholder="请输入姓名" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-base outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400" />
+              </div>
+              <div>
+                <label class="text-xs text-slate-500">证件类型</label>
+                <select x-model="equityFormIdType" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-base outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400 bg-white">
+                  <option value="" disabled>请选择</option>
+                  <template x-for="(t, ti) in equityIdTypeOptions" :key="'idtype-' + ti">
+                    <option :value="t" x-text="t"></option>
+                  </template>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs text-slate-500">证件号码</label>
+                <input type="text" x-model="equityFormIdNo" placeholder="请输入证件号码" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-base outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400" />
+              </div>
+
+              <!-- 未登录：手机号 + 验证码 -->
+              <div x-show="!loggedIn">
+                <label class="text-xs text-slate-500">手机号</label>
+                <input type="tel" maxlength="11" x-model="equityFormPhone" placeholder="请输入手机号" class="mt-1 w-full rounded-xl border border-slate-200 px-4 py-3 text-base outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400" />
+              </div>
+              <div x-show="!loggedIn">
+                <label class="text-xs text-slate-500">验证码</label>
+                <div class="mt-1 flex gap-2">
+                  <input type="text" maxlength="6" x-model="equityFormSmsCode" placeholder="请输入验证码" class="flex-1 rounded-xl border border-slate-200 px-4 py-3 text-base outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400" />
+                  <button type="button" @click="sendEquitySmsCode && sendEquitySmsCode()" :disabled="equitySmsCountdown > 0" class="shrink-0 px-4 rounded-xl bg-slate-100 text-[#07C160] font-medium text-sm disabled:opacity-50" x-text="equitySmsCountdown > 0 ? equitySmsCountdown + 's' : '获取验证码'"></button>
+                </div>
+              </div>
+
+              <label class="flex items-start gap-2 text-[11px] text-slate-600 cursor-pointer">
+                <input type="checkbox" x-model="cardAgree" class="mt-0.5 rounded border-slate-300 text-orange-500 focus:ring-orange-400" />
+                <span>我已阅读并同意 <a href="#" class="text-blue-600" @click.prevent>《用户服务协议》</a> <a href="#" class="text-blue-600" @click.prevent>《隐私政策》</a></span>
+              </label>
+
+              <!-- 未登录：已激活入口 -->
+              <div x-show="!loggedIn" class="pt-2 flex justify-end">
+                <button type="button" class="text-xs text-slate-500 hover:text-slate-700" @click="gotoLoginFromEquityActivate && gotoLoginFromEquityActivate()">
+                  已激活？直接登录 <span class="text-slate-400">›</span>
+                </button>
+              </div>
+            </div>
           </div>
 
           <!-- 卖点三列 -->
@@ -785,8 +860,72 @@
           <button type="button" @click="showService = true" class="flex flex-col items-center text-[10px] text-slate-500 px-1">
             <span class="text-lg"><i class="ri-headphone-line"></i></span>客服
           </button>
-          <button type="button" x-show="!cardActivatePageSuccess" @click="activateCard()" class="flex-1 min-w-0 px-5 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-orange-500 text-white text-sm font-bold shadow-lg shadow-orange-300/40">激活权益</button>
-          <button type="button" x-show="cardActivatePageSuccess" @click="backToHomeFromCardPage()" class="flex-1 min-w-0 px-5 py-3 rounded-2xl bg-emerald-600 text-white text-sm font-bold shadow-lg shadow-emerald-600/25">返回首页</button>
+          <button type="button"
+                  x-show="!loggedIn || !drugCardActivated || equityActivateFormOpen"
+                  @click="activateCard()"
+                  class="flex-1 min-w-0 px-5 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-orange-500 text-white text-sm font-bold shadow-lg shadow-orange-300/40">
+            确定激活
+          </button>
+          <button type="button"
+                  x-show="loggedIn && drugCardActivated && !equityActivateFormOpen"
+                  @click="view='main'; tab='home'"
+                  class="flex-1 min-w-0 px-5 py-3 rounded-2xl bg-emerald-600 text-white text-sm font-bold shadow-lg shadow-emerald-600/25">
+            返回首页
+          </button>
+        </div>
+      </div>
+    </template>
+
+    <!-- ========== 我的权益 ========== -->
+    <template x-if="view === 'myEquities'">
+      <div class="fixed inset-0 z-[62] bg-[#f4f4f5] max-w-md mx-auto left-0 right-0 flex flex-col">
+        <header class="shrink-0 bg-white border-b border-slate-100">
+          <div class="h-12 px-3 flex items-center justify-between">
+            <button type="button" @click="closeMyEquities && closeMyEquities()" class="w-9 h-9 -ml-1 rounded-xl text-slate-700 text-xl flex items-center justify-center" aria-label="关闭">×</button>
+            <h1 class="text-base font-semibold text-slate-900">我的权益</h1>
+            <button type="button" @click="showService = true" class="w-9 h-9 -mr-1 rounded-xl text-slate-500 text-xl flex items-center justify-center" aria-label="客服">
+              <i class="ri-customer-service-2-line text-lg"></i>
+            </button>
+          </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto px-3 py-3 pb-28 safe-pb">
+          <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+            <p class="text-xs text-slate-500 text-center">点击卡片选择您想使用的权益</p>
+          </div>
+
+          <div class="mt-3 space-y-3">
+            <template x-for="c in (equityCards || [])" :key="'eq-' + (c.id || c.name)">
+              <button type="button"
+                      @click="selectEquityCard && selectEquityCard(c)"
+                      class="w-full text-left rounded-2xl overflow-hidden border shadow-sm active:opacity-95"
+                      :class="String(activeEquityCardId||'') === String(c.id||'') ? 'border-orange-400 ring-2 ring-orange-200' : 'border-slate-100'">
+                <div class="bg-[#1f2937] text-white px-4 py-3 flex items-center justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="text-sm font-black truncate" x-text="c.name || '华润e•药惠通2026'"></p>
+                    <p class="text-[11px] text-white/70 mt-1 truncate" x-text="c.expireAt ? ('有效期至：' + c.expireAt) : ''"></p>
+                  </div>
+                  <div class="shrink-0 flex items-center gap-2">
+                    <span class="text-[11px] font-bold bg-white/15 px-2.5 py-1 rounded-full">保障中</span>
+                    <span class="w-6 h-6 rounded-full flex items-center justify-center"
+                          :class="String(activeEquityCardId||'') === String(c.id||'') ? 'bg-orange-500 text-white' : 'bg-white/15 text-white/70'">
+                      <i class="ri-check-line"></i>
+                    </span>
+                  </div>
+                </div>
+                <div class="bg-white px-4 py-3 flex items-center justify-between">
+                  <button type="button" @click.stop="toast && toast('权益详情（演示）')" class="text-xs font-semibold text-slate-700 border border-slate-200 px-3 py-2 rounded-full">权益详情</button>
+                  <span class="text-xs text-slate-400">点击切换</span>
+                </div>
+              </button>
+            </template>
+          </div>
+        </div>
+
+        <div class="shrink-0 bg-white border-t border-slate-200 px-3 py-3 safe-pb">
+          <button type="button" @click="openCardActivatePage(); equityActivateFormOpen = true; scrollEquityActivateForm && scrollEquityActivateForm()" class="w-full py-3 rounded-2xl bg-emerald-600 text-white text-sm font-bold shadow-md shadow-emerald-600/20">
+            添加并激活新的权益
+          </button>
         </div>
       </div>
     </template>
@@ -855,7 +994,7 @@
                   <div class="leading-tight" x-show="loggedIn">
                     <p class="text-red-600 font-bold text-lg">¥<span x-text="drugOriginalPrice(d).toFixed(2)"></span><span class="text-[11px] font-medium text-red-500 ml-0.5">原价</span></p>
                     <p class="mt-1" x-show="isEquityDeductible(d)">
-                      <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded">权益卡</span>
+                      <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded">权益</span>
                       <span class="text-[10px] text-slate-400 ml-1">可抵扣</span>
                     </p>
                   </div>
@@ -911,7 +1050,7 @@
                   <div class="leading-tight" x-show="loggedIn">
                     <p class="text-red-600 font-bold text-lg">¥<span x-text="drugOriginalPrice(d).toFixed(2)"></span><span class="text-[11px] font-medium text-red-500 ml-0.5">原价</span></p>
                     <p class="mt-1" x-show="isEquityDeductible(d)">
-                      <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded">权益卡</span>
+                      <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded">权益</span>
                       <span class="text-[10px] text-slate-400 ml-1">可抵扣</span>
                     </p>
                   </div>
@@ -986,7 +1125,7 @@
                     <div x-show="loggedIn">
                       <p class="text-sm font-bold text-red-600 leading-snug">¥<span x-text="drugOriginalPrice(d).toFixed(2)"></span> 原价</p>
                       <p class="mt-1" x-show="isEquityDeductible(d)">
-                        <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded">权益卡</span>
+                        <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded">权益</span>
                         <span class="text-[10px] text-slate-400 ml-1">可抵扣</span>
                       </p>
                     </div>
@@ -1120,7 +1259,7 @@
                         <div class="leading-tight" x-show="loggedIn">
                           <p class="text-red-600 text-sm font-bold">¥<span x-text="topicItemOriginal(it).toFixed(2)"></span><span class="text-[10px] font-medium ml-0.5">原价</span></p>
                           <p class="mt-1" x-show="isEquityDeductible(topicItemAsDrug(it))">
-                            <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded">权益卡</span>
+                            <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded">权益</span>
                             <span class="text-[10px] text-slate-400 ml-1">可抵扣</span>
                           </p>
                         </div>
@@ -1179,7 +1318,7 @@
                               <div class="leading-tight" x-show="loggedIn">
                                 <p class="text-red-600 font-bold text-sm">¥<span x-text="topicItemOriginal(it).toFixed(2)"></span><span class="text-[10px] ml-0.5">原价</span></p>
                                 <p class="mt-1" x-show="isEquityDeductible(topicItemAsDrug(it))">
-                                  <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded">权益卡</span>
+                                  <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded">权益</span>
                                   <span class="text-[10px] text-slate-400 ml-1">可抵扣</span>
                                 </p>
                               </div>
@@ -1275,7 +1414,7 @@
                     <div class="leading-tight" x-show="loggedIn">
                       <p class="text-red-600 text-sm font-bold">¥<span x-text="drugOriginalPrice(d).toFixed(2)"></span><span class="text-[10px] font-medium ml-0.5">原价</span></p>
                       <p class="mt-1" x-show="isEquityDeductible(d)">
-                        <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded">权益卡</span>
+                        <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded">权益</span>
                         <span class="text-[10px] text-slate-400 ml-1">可抵扣</span>
                       </p>
                     </div>
@@ -1561,7 +1700,7 @@
                           <div>
                             <p class="text-red-600 font-bold text-sm text-center">¥<span x-text="Number(it.originalPrice ?? it.price ?? 0).toFixed(2)"></span><span class="text-[10px] ml-0.5">原价</span></p>
                             <div class="mt-1 flex items-center justify-center gap-1" x-show="isEquityDeductible(topicItemAsDrug(it))">
-                              <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded">权益卡</span>
+                              <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-1.5 py-0.5 rounded">权益</span>
                               <span class="text-[10px] text-slate-400">可抵扣</span>
                             </div>
                           </div>
@@ -2030,33 +2169,45 @@
                 </button>
               </div>
             </div>
-            <!-- 权益卡切换（按需求隐藏） -->
+            <!-- 已激活权益卡展示 -->
+            <div x-show="loggedIn && drugCardActivated" class="mt-5 flex items-center justify-between">
+              <p class="text-[12px] font-semibold text-white/95">我的权益</p>
+            </div>
+            <button type="button"
+                    x-show="loggedIn && drugCardActivated"
+                    @click="openMyEquities && openMyEquities()"
+                    class="mt-2 w-full rounded-2xl bg-[#1f2937]/90 border border-white/10 shadow-lg overflow-hidden text-left active:opacity-95">
+              <div class="px-4 py-3 flex items-center justify-between">
+                <div class="min-w-0">
+                  <p class="text-sm font-black tracking-wide truncate" x-text="(activeEquityCard && activeEquityCard.name) ? activeEquityCard.name : '华润e•药惠通2026'"></p>
+                  <div class="mt-2 flex items-center gap-3 text-[11px] text-white/75">
+                    <span>已省：<span class="text-white font-bold" x-text="activeEquityCard && (activeEquityCard.savedAmount != null) ? (Number(activeEquityCard.savedAmount).toFixed(2) + '元') : '0元'"></span></span>
+                    <span class="opacity-60">｜</span>
+                    <span x-text="activeEquityCard && activeEquityCard.expireAt ? ('有效期至' + activeEquityCard.expireAt) : ''"></span>
+                  </div>
+                </div>
+                <span class="shrink-0 text-[11px] font-bold bg-[#f5deb3]/90 text-slate-900 px-4 py-2 rounded-full"
+                      x-text="(equityCards && equityCards.length) ? ('查看全部（' + equityCards.length + '）') : '查看全部（0）'"></span>
+              </div>
+              <div class="h-1 bg-white/10">
+                <div class="h-full w-1/4 bg-orange-500"></div>
+              </div>
+            </button>
           </div>
 
           <div class="px-3 -mt-6 space-y-3 relative z-10">
-            <!-- 我的权益（福利卡横向权益入口） -->
-            <div x-show="loggedIn" class="bg-gradient-to-b from-[#FFF1E5] to-white rounded-2xl border border-orange-100/90 p-4 shadow-sm">
-              <div class="flex items-center justify-between mb-3">
-                <p class="text-sm font-bold text-slate-900">我的权益</p>
-                <button type="button" @click="openCardActivatePage(true)" class="text-xs text-slate-600 hover:text-slate-800">
-                  查看权益 <span class="text-slate-400">›</span>
-                </button>
+            <!-- 未登录：权益激活入口 -->
+            <button type="button"
+                    x-show="!loggedIn"
+                    @click="openCardActivatePage()"
+                    class="w-full rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 text-white text-left px-4 py-3 shadow-md shadow-orange-200/50 flex items-center justify-between active:opacity-95">
+              <div class="min-w-0">
+                <p class="text-sm font-black truncate">华润e·药惠通</p>
+                <p class="text-[11px] text-white/90 mt-1 truncate">好药保供｜用药无忧</p>
               </div>
-              <div class="flex gap-5 overflow-x-auto pb-1 -mx-0.5 px-0.5">
-                <template x-for="(b, bi) in myBenefits" :key="'ben-' + bi">
-                  <div class="shrink-0 w-[4.75rem] text-center">
-                    <div class="w-12 h-12 mx-auto rounded-full bg-gradient-to-b from-slate-700 to-slate-900 flex items-center justify-center text-amber-100 text-lg shadow-md mb-2">
-                      <i :class="b.icon"></i>
-                    </div>
-                    <p class="text-xs font-bold text-slate-900 leading-tight" x-text="b.title"></p>
-                    <p class="text-[10px] text-slate-500 mt-0.5 leading-tight" x-text="b.sub"></p>
-                  </div>
-                </template>
-              </div>
-              <div class="h-1 rounded-full bg-slate-200/90 mt-3 mx-10 overflow-hidden">
-                <div class="h-full w-1/4 rounded-full bg-orange-400"></div>
-              </div>
-            </div>
+              <span class="shrink-0 text-[11px] font-bold bg-white/20 px-3 py-1.5 rounded-full">权益激活</span>
+            </button>
+
             <!-- 我的订单 -->
             <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
               <div class="flex items-center justify-between mb-3">
@@ -2493,7 +2644,7 @@
               <div x-show="detailPriceMode === 'deduct' || (detailPriceMode === 'auto' && equityQuotaActive)">
                 <p class="text-lg font-black text-red-600 leading-snug">¥<span x-text="drugOriginalPrice(detailDrug).toFixed(2)"></span> 原价</p>
                 <div class="mt-2 flex items-center gap-2" x-show="isEquityDeductible(detailDrug)">
-                  <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-2 py-1 rounded">权益卡</span>
+                  <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-600 border border-red-100 bg-red-50 px-2 py-1 rounded">权益</span>
                   <span class="text-[10px] font-semibold text-slate-500 border border-slate-200 bg-white px-2 py-1 rounded">可抵扣</span>
                 </div>
               </div>
@@ -2715,11 +2866,11 @@
       </div>
     </template>
 
-    <!-- 药诊卡激活成功 -->
+    <!-- 权益卡激活成功 -->
     <div x-show="activateSuccessModal" x-transition.opacity class="fixed inset-0 z-[90] bg-black/50 flex items-center justify-center px-6 max-w-md mx-auto">
       <div class="bg-white rounded-2xl p-6 w-full shadow-xl text-center" @click.stop>
         <div class="w-14 h-14 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl mb-3">✓</div>
-        <p class="text-lg font-bold text-slate-900">药诊卡激活成功</p>
+        <p class="text-lg font-bold text-slate-900">权益卡激活成功</p>
         <p class="text-sm text-slate-600 mt-2">即刻享受购物折扣</p>
         <button type="button" @click="finishActivate()" class="w-full mt-6 py-3 rounded-xl bg-brand-600 text-white font-semibold">知道了</button>
       </div>
@@ -2938,6 +3089,18 @@
         /** 药诊卡二级页：本页是否已展示「激活成功」态（每次进入页面从表单开始） */
         cardActivatePageSuccess: false,
         activateSuccessModal: false,
+        /** 权益激活表单字段 */
+        equityFormCardNo: '',
+        equityFormCardPwd: '',
+        equityFormHolderName: '',
+        equityFormIdType: '',
+        equityFormIdNo: '',
+        equityFormPhone: '',
+        equityFormSmsCode: '',
+        equitySmsCountdown: 0,
+        equitySmsTimer: null,
+        equityActivateFormOpen: true,
+        equityIdTypeOptions: ['身份证', '护照', '台胞证', '港澳通行证', '外国人永久居留身份证'],
         bannerIdx: 0,
         bannerTimer: null,
         showService: false,
@@ -3010,12 +3173,39 @@
         activeCardIdx: 0,
         equityCards: (() => {
           try {
+            const rawByPhone = window.localStorage?.getItem('equityCardsByPhone') || '';
+            const byPhone = rawByPhone ? JSON.parse(rawByPhone) : {};
+            const phone = String(window.localStorage?.getItem('lastLoginPhone') || '').trim();
+            const bundle = (phone && byPhone && typeof byPhone === 'object') ? byPhone[phone] : null;
+            if (bundle && Array.isArray(bundle.cards)) return bundle.cards;
+            // 兼容旧结构
             const ok = String(window.localStorage?.getItem('drugCardActivated') || '') === '1';
-            return ok ? [{ name: '药诊优享卡', discount: '7折' }] : [];
+            return ok ? [{ id: 'legacy', name: '华润e•药惠通2026', discount: '7折', holderName: '', savedAmount: 0, expireAt: '2026-12-31' }] : [];
           } catch (e) {
             return [];
           }
         })(),
+        activeEquityCardId: (() => {
+          try {
+            const rawByPhone = window.localStorage?.getItem('equityCardsByPhone') || '';
+            const byPhone = rawByPhone ? JSON.parse(rawByPhone) : {};
+            const phone = String(window.localStorage?.getItem('lastLoginPhone') || '').trim();
+            const bundle = (phone && byPhone && typeof byPhone === 'object') ? byPhone[phone] : null;
+            return bundle && bundle.activeId ? String(bundle.activeId) : '';
+          } catch (e) {
+            return '';
+          }
+        })(),
+        get activeEquityCard() {
+          const list = Array.isArray(this.equityCards) ? this.equityCards : [];
+          if (!list.length) return null;
+          const aid = String(this.activeEquityCardId || '').trim();
+          if (aid) {
+            const hit = list.find(c => String(c?.id || '') === aid);
+            if (hit) return hit;
+          }
+          return list[0] || null;
+        },
         drugCardActivated: (() => {
           try {
             return String(window.localStorage?.getItem('drugCardActivated') || '') === '1';
@@ -4508,14 +4698,26 @@
          * @param {boolean} showActivatedIfAlready 已开通权益时是否直接展示「已激活」态（如个人中心「查看权益」）
          */
         openCardActivatePage(showActivatedIfAlready = false) {
-          const p = String(this.loginPhone || '').trim();
-          if (/^1\d{10}$/.test(p)) this.activatePhone = p;
-          else if (!/^1\d{10}$/.test(String(this.activatePhone || '').trim())) this.activatePhone = '';
-          this.activateCode = '';
-          this.cardAgree = false;
-          this.cardActivatePageSuccess = !!(showActivatedIfAlready && this.drugCardActivated);
-          this.activateSuccessModal = false;
+          if (this.initEquityActivatePage) this.initEquityActivatePage();
           this.view = 'cardActivate';
+        },
+
+        openMyEquities() {
+          if (!this.loggedIn) { this.view = 'login'; return; }
+          this.view = 'myEquities';
+        },
+        closeMyEquities() {
+          this.view = 'main';
+          this.tab = 'profile';
+        },
+        selectEquityCard(card) {
+          if (!card) return;
+          const id = String(card.id || '').trim();
+          if (!id) return;
+          this.activeEquityCardId = id;
+          const p = String(this.loginPhone || '').trim();
+          this.saveEquityCardsForPhone(p);
+          this.toast('已切换权益卡');
         },
 
         drugUnitPrice(d) {
@@ -4570,6 +4772,77 @@
           }, 1000);
           this.toast('验证码已发送（演示）');
         },
+        initEquityActivatePage() {
+          // 初始化激活表单（根据登录态）
+          try {
+            if (this.loggedIn) {
+              const p = String(this.loginPhone || '').trim();
+              if (/^1\d{10}$/.test(p)) this.equityFormPhone = p;
+            } else {
+              const p = String(this.equityFormPhone || '').trim() || String(this.loginPhone || '').trim();
+              if (/^1\d{10}$/.test(p)) this.equityFormPhone = p;
+            }
+          } catch (e) {}
+          // 已登录且已有权益卡：默认收起表单
+          this.equityActivateFormOpen = !(this.loggedIn && Array.isArray(this.equityCards) && this.equityCards.length > 0);
+
+          // 预填演示数据（仅在空值时填充，避免覆盖手动输入）
+          if (!String(this.equityFormCardNo || '').trim()) this.equityFormCardNo = 'YHT2026000001';
+          if (!String(this.equityFormCardPwd || '').trim()) this.equityFormCardPwd = '888888';
+          if (!String(this.equityFormHolderName || '').trim()) this.equityFormHolderName = '张三';
+          if (!String(this.equityFormIdType || '').trim()) this.equityFormIdType = '身份证';
+          if (!String(this.equityFormIdNo || '').trim()) this.equityFormIdNo = '110101199001011234';
+          if (!this.loggedIn) {
+            if (!String(this.equityFormSmsCode || '').trim()) this.equityFormSmsCode = '123456';
+          } else {
+            this.equityFormSmsCode = '';
+          }
+          this.cardAgree = true;
+        },
+        scrollEquityActivateForm() {
+          try {
+            this.equityActivateFormOpen = true;
+            const el = document.getElementById('equity-activate-form');
+            if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } catch (e) {}
+        },
+        gotoLoginFromEquityActivate() {
+          this.view = 'login';
+        },
+        sendEquitySmsCode() {
+          if (this.loggedIn) return;
+          const p = String(this.equityFormPhone || '').trim();
+          if (!/^1\d{10}$/.test(p)) { this.toast('请输入正确手机号'); return; }
+          if (this.equitySmsCountdown > 0) return;
+          this.equitySmsCountdown = 60;
+          if (this.equitySmsTimer) { try { clearInterval(this.equitySmsTimer); } catch (e) {} }
+          this.equitySmsTimer = setInterval(() => {
+            this.equitySmsCountdown--;
+            if (this.equitySmsCountdown <= 0) {
+              try { clearInterval(this.equitySmsTimer); } catch (e) {}
+              this.equitySmsTimer = null;
+            }
+          }, 1000);
+          this.toast('验证码已发送（演示：123456）');
+        },
+        saveEquityCardsForPhone(phone) {
+          try {
+            const p = String(phone || '').trim();
+            if (!/^1\d{10}$/.test(p)) return;
+            const raw = window.localStorage?.getItem('equityCardsByPhone') || '';
+            const byPhone = raw ? JSON.parse(raw) : {};
+            const cards = Array.isArray(this.equityCards) ? this.equityCards : [];
+            const activeId = String(this.activeEquityCardId || (cards[0] ? (cards[0].id || '') : ''));
+            byPhone[p] = { cards, activeId };
+            window.localStorage?.setItem('equityCardsByPhone', JSON.stringify(byPhone));
+            window.localStorage?.setItem('lastLoginPhone', p);
+          } catch (e) {}
+        },
+        syncEquityActivatedFlag() {
+          const ok = this.loggedIn && Array.isArray(this.equityCards) && this.equityCards.length > 0;
+          this.drugCardActivated = !!ok;
+          try { window.localStorage?.setItem('drugCardActivated', ok ? '1' : '0'); } catch (e) {}
+        },
         oneClickLogin() {
           this.loginPhone = '13999998888';
           this.loginCode = '123456';
@@ -4596,6 +4869,20 @@
           if (this.loginCode !== '123456') { this.toast('演示环境验证码为 123456'); return; }
           this.loggedIn = true;
           this.userMask = this.loginPhone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
+          try { window.localStorage?.setItem('lastLoginPhone', String(this.loginPhone || '').trim()); } catch (e) {}
+
+          // 登录后加载该手机号已绑定的权益卡
+          try {
+            const raw = window.localStorage?.getItem('equityCardsByPhone') || '';
+            const byPhone = raw ? JSON.parse(raw) : {};
+            const bundle = byPhone && typeof byPhone === 'object' ? byPhone[String(this.loginPhone || '').trim()] : null;
+            this.equityCards = (bundle && Array.isArray(bundle.cards)) ? bundle.cards : [];
+            this.activeEquityCardId = bundle && bundle.activeId ? String(bundle.activeId) : (this.equityCards[0] ? String(this.equityCards[0].id || '') : '');
+          } catch (e) {
+            this.equityCards = [];
+            this.activeEquityCardId = '';
+          }
+          this.syncEquityActivatedFlag();
 
           // 登录后根据“待完成动作”回跳
           const action = this.pendingAction;
@@ -4615,16 +4902,11 @@
             this.view = 'main';
           }
 
-          // 演示：登录后默认视为“已完成权益激活”，且处于“权益卡固定额度可抵扣”阶段
-          this.drugCardActivated = true;
-          if (!Array.isArray(this.equityCards) || this.equityCards.length === 0) {
-            this.equityCards = [{ name: '药诊优享卡', discount: '7折' }];
+          // 若该账号已有权益卡，则初始化额度（演示）
+          if (this.drugCardActivated) {
+            this.equityQuotaRemaining = this.equityQuotaTotal;
+            try { window.localStorage?.setItem('equityQuotaRemaining', String(this.equityQuotaRemaining)); } catch (e) {}
           }
-          this.equityQuotaRemaining = this.equityQuotaTotal;
-          try {
-            window.localStorage?.setItem('drugCardActivated', '1');
-            window.localStorage?.setItem('equityQuotaRemaining', String(this.equityQuotaRemaining));
-          } catch (e) {}
 
           this.toast('登录成功');
 
@@ -4638,6 +4920,7 @@
           this.userMask = '';
           this.equityCards = [];
           this.activeCardIdx = 0;
+          this.activeEquityCardId = '';
           this.drugCardActivated = false;
           try { window.localStorage?.setItem('drugCardActivated', '0'); } catch (e) {}
           this.equityQuotaRemaining = this.equityQuotaTotal;
@@ -4662,34 +4945,96 @@
           this.cardActivatePageSuccess = false;
         },
         activateCard() {
-          if (!/^1\d{10}$/.test(this.activatePhone)) { this.toast('请输入正确手机号'); return; }
-          if (!this.cardAgree) { this.toast('请阅读并勾选协议'); return; }
-          const already = this.drugCardActivated;
-          this.equityCards = [
-            { name: '药诊优享卡', discount: '7折' }
-          ];
-          this.drugCardActivated = true;
-          try { window.localStorage?.setItem('drugCardActivated', '1'); } catch (e) {}
-          // 激活成功后视为“已登录 + 已激活”，用于各页面按登录态展示价格
+          const cardNo = String(this.equityFormCardNo || '').trim();
+          const cardPwd = String(this.equityFormCardPwd || '').trim();
+          const holderName = String(this.equityFormHolderName || '').trim();
+          const idType = String(this.equityFormIdType || '').trim();
+          const idNo = String(this.equityFormIdNo || '').trim();
+          const phone = this.loggedIn ? String(this.loginPhone || '').trim() : String(this.equityFormPhone || '').trim();
+          const sms = String(this.equityFormSmsCode || '').trim();
+
+          if (!cardNo) { this.toast('请输入卡号'); return; }
+          if (!cardPwd) { this.toast('请输入卡密'); return; }
+          if (!holderName) { this.toast('请输入姓名'); return; }
+          if (!idType) { this.toast('请选择证件类型'); return; }
+          if (!idNo) { this.toast('请输入证件号码'); return; }
+          if (!this.loggedIn) {
+            if (!/^1\d{10}$/.test(phone)) { this.toast('请输入正确手机号'); return; }
+            if (sms !== '123456') { this.toast('验证码错误'); return; }
+          }
+          if (!this.cardAgree) { this.toast('请先阅读并勾选协议'); return; }
+
+          // 模拟后端校验（演示）
+          try {
+            const rawReg = window.localStorage?.getItem('equityCardRegistry') || '';
+            const reg = rawReg ? JSON.parse(rawReg) : {};
+            const existing = reg && typeof reg === 'object' ? reg[cardNo] : null;
+
+            // 简单卡密校验：演示环境允许 888888 / 123456 / 或 >=6 位
+            if (!(cardPwd === '888888' || cardPwd === '123456' || cardPwd.length >= 6)) {
+              this.toast('密码错误');
+              return;
+            }
+            if (existing && existing.phone && String(existing.phone) !== phone) {
+              this.toast('卡已激活');
+              return;
+            }
+            if (existing && existing.idType && existing.idNo) {
+              if (String(existing.idType) !== idType || String(existing.idNo) !== idNo) {
+                this.toast('证件不匹配');
+                return;
+              }
+            }
+            reg[cardNo] = { phone, idType, idNo };
+            window.localStorage?.setItem('equityCardRegistry', JSON.stringify(reg));
+          } catch (e) {}
+
+          // 未登录激活：自动注册 + 自动登录
           if (!this.loggedIn) {
             this.loggedIn = true;
-            const p = String(this.activatePhone || '').trim();
-            this.loginPhone = p || this.loginPhone;
-            if (p) this.userMask = p.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
+            this.loginPhone = phone;
+            this.userMask = phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
+            try { window.localStorage?.setItem('lastLoginPhone', phone); } catch (e) {}
           }
-          if (!already) {
-            this.equityQuotaRemaining = this.equityQuotaTotal;
-            try { window.localStorage?.setItem('equityQuotaRemaining', String(this.equityQuotaRemaining)); } catch (e) {}
+
+          // 绑定权益卡（可多张）
+          const cardMask = cardNo.length >= 6 ? (cardNo.slice(0, 2) + '****' + cardNo.slice(-4)) : cardNo;
+          if (!Array.isArray(this.equityCards)) this.equityCards = [];
+          const existed = this.equityCards.find(c => String(c?.cardNoMasked || '') === cardMask);
+          if (!existed) {
+            const nowId = 'ec_' + Date.now().toString(16) + '_' + Math.random().toString(16).slice(2, 8);
+            const newCard = {
+              id: nowId,
+              name: '华润e•药惠通2026',
+              discount: '7折',
+              holderName,
+              idType,
+              idNo,
+              cardNoMasked: cardMask,
+              savedAmount: 100.99,
+              expireAt: '2026-12-31'
+            };
+            this.equityCards = [newCard, ...this.equityCards];
+            this.activeEquityCardId = String(newCard.id);
+          } else {
+            this.activeEquityCardId = String(existed.id || '');
           }
+
+          this.saveEquityCardsForPhone(phone);
+          this.syncEquityActivatedFlag();
+
+          // 激活成功：弹窗提示，点击“知道了”后停留在激活页
+          this.equityQuotaRemaining = this.equityQuotaTotal;
+          try { window.localStorage?.setItem('equityQuotaRemaining', String(this.equityQuotaRemaining)); } catch (e) {}
           this.showDiscountDetail = false;
-          this.cardActivatePageSuccess = true;
+          // 激活成功后进入“默认已激活”展示态：隐藏表单 + 底部显示返回首页
+          this.equityActivateFormOpen = false;
           this.activateSuccessModal = true;
-          if (already) {
-            this.toast('核验成功，权益继续有效（演示）');
-          }
         },
         finishActivate() {
           this.activateSuccessModal = false;
+          // 关闭弹窗后仍保持“默认已激活”展示态
+          if (this.loggedIn && this.drugCardActivated) this.equityActivateFormOpen = false;
         },
 
         toast(msg) {
